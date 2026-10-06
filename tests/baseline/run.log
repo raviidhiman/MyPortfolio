@@ -1,0 +1,32 @@
+PASS N1 loads: h1, 7 sections, no console/page errors :: errors=[]
+PASS N2 nav 'Contact' brings #contact fully into view :: contact top=324 bottom=761 viewport=900 scrollY=3837/3837 (last section bottoms out; fully visible)
+PASS N2b nav 'Home' scrolls to top
+PASS N3 drawer opens; closes by Esc, outside click and link navigation :: open=True esc=True outside=True link=True
+PASS N4 accordion rows toggle by click, Enter and Space :: click-open=True click-close=True enter=True space=True
+PASS N5 search: answer + section chips; no-hit message; Esc clears :: chips=1 nohit='I couldn't find that on the portfolio ye' cleared=True answer_is_retrieval_fallback=True
+PASS N6 guided tour starts and stops on user scroll :: started=True stopped_by_wheel=True
+PASS N7 typewriter animates (motion allowed) :: 'AI ' -> 'AI & ML solution'
+PASS N8 mailto row triggers copy toast :: mailto=mailto:you@example.com (placeholder in prototype) toast=True
+PASS N9 external links open with target=_blank rel~noopener
+PASS N10 admin-login stub modal opens/closes :: stub modal says backend not connected
+PASS N11 scroll progress bar + section dots update
+PASS N12 reduced-motion: typewriter shows full static text
+PASS N13 mobile 390px: no horizontal overflow :: overflow_px=0
+PASS S1 screenshots: 3 viewports x (home + 7 sections + drawer)
+PASS A1 axe-core scan of normal mode (informational) :: violations (informational, not pass/fail): region[moderate]x1
+PASS D1 Drive Mode starts; chooser shown; page scroll locked :: choose_overlay=True body_overflow=hidden
+PASS D2 WebGL canvas renders non-blank :: png_bytes=180745
+PASS D3 W accelerates, Space brakes :: speed_after_gas=74km/h after_brake=0km/h
+PASS D4 C cycles through 4 camera modes :: titles=Switch camera | Camera: Chase · Far | Camera: Hood | Camera: Cockpit | Camera: Chase · Close
+PASS D5 fast travel via button and mini-map; lands on Projects Street :: list_open=True street='Projects Street' minimap_toggle=True
+PASS D6 near a sign: info pill -> detail panel -> Keep driving :: pill=True panel=True keep_driving_closes=True (position set via internal state: white-box)
+PASS D7 'Open in Normal Mode' exits Drive and scrolls to the section :: drive_off=True scroll_unlocked=True at_projects=True
+PASS D8 car switch and sound toggle :: car 'Car: G-Wagon' -> 'Car: Sports'; sound icon toggles=True
+PASS D9 no network calls during render loop (fetch/XHR/beacon/WS) :: script-initiated network calls while driving=0; frames=42 p50=150.0ms p95=183.3ms (software GL)
+PASS D10 Esc exits Drive Mode :: Esc exits Drive, restores scrolling
+PASS D11 no console/page errors during Drive session :: errors=[]
+PASS D13 touch device: pedals visible; GAS accelerates :: pedals_visible=True speed_with_GAS=107km/h
+PASS F1 CDN blocked -> stays in Normal Mode (via alert) :: alert shown=['Could not load 3D engine. Staying in Normal Mode.'] (BASELINE DEFECT vs Blueprint: uses blocking alert())
+PASS F2 no window.claude runtime -> search still answers via retrieval
+
+TOTAL pass=30 fail=0

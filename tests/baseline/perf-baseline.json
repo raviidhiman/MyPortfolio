@@ -1,0 +1,7 @@
+{
+ "frames": 42,
+ "p50_ms": 150,
+ "p95_ms": 183.3,
+ "net_calls_in_loop": 0,
+ "note": "SwiftShader software GL; compare before/after only"
+}

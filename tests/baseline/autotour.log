@@ -1,0 +1,1 @@
+PASS D12 auto tour reaches 'Tour complete' (Next clicked at each stop to skip waits) :: panels seen=['About · 1/7', 'Skills · 2/7', 'Projects · 3/7', 'Experience · 4/7', 'Education · 5/7', 'Research · 6/7', 'Contact · 7/7', 'Tour complete'] elapsed=285s of 1500s budget (software GL ~7fps => sim runs slower than real time)
