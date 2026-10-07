@@ -65,7 +65,7 @@ def open_page(ctx, errs=None, dialogs=None):
     p = ctx.new_page()
     if errs is not None:
         p.on("pageerror", lambda e: errs.append("pageerror: " + str(e)))
-        p.on("console", lambda m: errs.append("console." + m.type + ": " + m.text) if m.type == "error" else None)
+        p.on("console", lambda m: errs.append("console." + m.type + ": " + m.text) if m.type == "error" and "status of 404" not in m.text else None)  # static test server has no /api: expected 404 -> offline fallback path
     if dialogs is not None:
         p.on("dialog", lambda d: (dialogs.append(d.message), d.accept()))
     p.goto(f"http://127.0.0.1:{PORT}/{PAGE}", wait_until="load")
@@ -142,10 +142,11 @@ def main():
         check("N9", "external links open with target=_blank rel~noopener",
               lambda: ev(p, "[...document.querySelectorAll('a[href^=http]')].every(a=>a.target=='_blank'&&/noopener/.test(a.rel))"))
         def modal():
-            p.click("#bHam"); p.click("#bAdmin"); p.wait_for_timeout(200)
-            o = ev(p, "document.getElementById('modal').classList.contains('on')"); p.click("#xModal"); p.wait_for_timeout(200)
-            return (o and not ev(p, "document.getElementById('modal').classList.contains('on')"), "stub modal says backend not connected")
-        check("N10", "admin-login stub modal opens/closes", modal)
+            p.click("#bHam"); p.wait_for_timeout(200)
+            with p.expect_navigation(wait_until="commit"): p.click("#bAdmin")
+            ok = "/admin/" in p.url; p.goto(f"http://127.0.0.1:{PORT}/{PAGE}", wait_until="load"); p.wait_for_timeout(400)
+            return (ok, "CHANGED BY DESIGN: Admin Login now navigates to /admin/ (was a stub modal)")
+        check("N10", "Admin Login button navigates to /admin/", modal)
         check("N11", "scroll progress bar + section dots update", lambda: (p.evaluate("scrollTo(0,document.documentElement.scrollHeight/2)") or p.wait_for_timeout(400) or True) and ev(p, "parseFloat(document.getElementById('prog').style.width)")>5 and ev(p, "document.querySelectorAll('#dots button.on').length")==1)
         ctx.close()
 

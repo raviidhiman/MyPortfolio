@@ -13,7 +13,7 @@
    "id": "N2",
    "name": "nav 'Contact' brings #contact fully into view",
    "result": "PASS",
-   "note": "contact top=324 bottom=761 viewport=900 scrollY=3837/3837 (last section bottoms out; fully visible)"
+   "note": "contact top=346 bottom=761 viewport=900 scrollY=4707/4707 (last section bottoms out; fully visible)"
   },
   {
    "id": "N2b",
@@ -37,7 +37,7 @@
    "id": "N5",
    "name": "search: answer + section chips; no-hit message; Esc clears",
    "result": "PASS",
-   "note": "chips=1 nohit='I couldn't find that on the portfolio ye' cleared=True answer_is_retrieval_fallback=True"
+   "note": "chips=3 nohit='I couldn't find that on the portfolio ye' cleared=True answer_is_retrieval_fallback=False"
   },
   {
    "id": "N6",
@@ -49,13 +49,13 @@
    "id": "N7",
    "name": "typewriter animates (motion allowed)",
    "result": "PASS",
-   "note": "'AI ' -> 'AI & ML solution'"
+   "note": "'AI &' -> 'AI & ML solutions'"
   },
   {
    "id": "N8",
    "name": "mailto row triggers copy toast",
    "result": "PASS",
-   "note": "mailto=mailto:you@example.com (placeholder in prototype) toast=True"
+   "note": "mailto=mailto:ravidhiman8673@gmail.com (placeholder in prototype) toast=True"
   },
   {
    "id": "N9",
@@ -65,9 +65,9 @@
   },
   {
    "id": "N10",
-   "name": "admin-login stub modal opens/closes",
+   "name": "Admin Login button navigates to /admin/",
    "result": "PASS",
-   "note": "stub modal says backend not connected"
+   "note": "CHANGED BY DESIGN: Admin Login now navigates to /admin/ (was a stub modal)"
   },
   {
    "id": "N11",
@@ -109,13 +109,13 @@
    "id": "D2",
    "name": "WebGL canvas renders non-blank",
    "result": "PASS",
-   "note": "png_bytes=180745"
+   "note": "png_bytes=166351"
   },
   {
    "id": "D3",
    "name": "W accelerates, Space brakes",
    "result": "PASS",
-   "note": "speed_after_gas=74km/h after_brake=0km/h"
+   "note": "speed_after_gas=61km/h after_brake=0km/h"
   },
   {
    "id": "D4",
@@ -151,7 +151,7 @@
    "id": "D9",
    "name": "no network calls during render loop (fetch/XHR/beacon/WS)",
    "result": "PASS",
-   "note": "script-initiated network calls while driving=0; frames=42 p50=150.0ms p95=183.3ms (software GL)"
+   "note": "script-initiated network calls while driving=0; frames=35 p50=166.7ms p95=250.0ms (software GL)"
   },
   {
    "id": "D10",
@@ -169,7 +169,7 @@
    "id": "D13",
    "name": "touch device: pedals visible; GAS accelerates",
    "result": "PASS",
-   "note": "pedals_visible=True speed_with_GAS=107km/h"
+   "note": "pedals_visible=True speed_with_GAS=93km/h"
   },
   {
    "id": "F1",
@@ -184,5 +184,5 @@
    "note": ""
   }
  ],
- "ran_at": "2026-10-06 04:26:15"
+ "ran_at": "2026-10-06 14:07:41"
 }

@@ -1,0 +1,1 @@
+{"name":"portfolio-server","version":"0.1.0","private":true,"type":"commonjs","scripts":{"start":"node index.js","test":"node --test test/api.test.js"},"dependencies":{"cookie-parser":"^1.4.7","express":"^4.21.2","pg":"^8.13.1"}}

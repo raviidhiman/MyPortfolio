@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>Admin — Ravi Dhiman</title>
+<style>
+:root{--bg:#05060f;--s:#0d1024;--s2:#141836;--t:#e8ecff;--m:#8d96c4;--cy:#00e5ff;--vi:#8b5cf6;--bd:#242a55;--bad:#ff5d7a;--ok:#34d399;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+header{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--bd);background:#05060fe6;position:sticky;top:0;z-index:5}
+header b{color:var(--cy);letter-spacing:1px;margin-right:auto}
+a.btn{text-decoration:none;color:inherit;display:inline-block}
+.tab,.btn{background:var(--s);border:1px solid var(--bd);border-radius:8px;padding:8px 14px;cursor:pointer}
+.tab[aria-selected=true]{border-color:var(--cy);color:var(--cy);background:#00e5ff14}
+.btn.pri{border-color:var(--cy);color:var(--cy);background:#00e5ff14;font-weight:600}.btn.del{border-color:#ff5d7a66;color:var(--bad)}.btn.sm{padding:4px 9px;font-size:13px}
+main{max-width:920px;margin:0 auto;padding:18px 16px 80px}h2{margin:.2em 0 .6em}
+.card{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:14px;margin:12px 0}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--s);margin:8px 0}
+.row .g{flex:1;min-width:150px}.row small{color:var(--m);display:block}.dim{opacity:.55}
+label{display:block;margin:10px 0 4px;color:var(--m);font-size:13px}
+input[type=text],input[type=email],input[type=url],input:not([type]),select,textarea{width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:9px 11px}
+textarea{min-height:90px;resize:vertical}input[type=color]{width:56px;height:38px;padding:2px;background:var(--bg);border:1px solid var(--bd);border-radius:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}@media(max-width:640px){.grid{grid-template-columns:1fr}}
+.msg{padding:9px 12px;border-radius:8px;margin:10px 0}.msg.err{background:#ff5d7a22;border:1px solid #ff5d7a66}.msg.ok{background:#34d39922;border:1px solid #34d39966}
+.login{max-width:380px;margin:12vh auto;padding:0 16px}.chk{display:flex;gap:8px;align-items:center;margin-top:12px}.chk input{width:auto}
+</style></head><body>
+<div id="app"></div>
+<script>
+const $app=document.getElementById('app');let CSRF='',ICONS=['user','code','folder','briefcase','cap','mail','github','linkedin','instagram','flask','auto','python','react','js','db','cpu','bolt','globe','chart'];
+const LAYOUTS=[['list','Plain list'],['skills','Skill tiles'],['projects','Numbered projects (expandable)'],['experience','Timeline (expandable)'],['education','Education tiles'],['contact','Contact links']];
+function h(tag,p,...kids){const e=document.createElement(tag);for(const k in(p||{})){const v=p[k];if(k==='class')e.className=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else if(v===true)e.setAttribute(k,'');else if(v!==false&&v!=null)e.setAttribute(k,v)}
+ kids.flat().forEach(c=>{if(c!=null&&c!==false)e.append(c.nodeType?c:document.createTextNode(c))});return e}
+async function api(m,p,b){const r=await fetch('/api/admin'+p,{method:m,credentials:'same-origin',headers:{'content-type':'application/json','x-csrf-token':CSRF},body:b?JSON.stringify(b):undefined});
+ let j=null;try{j=await r.json()}catch(_){}if(r.status===401&&!p.startsWith('/auth/')){login();throw new Error('Session expired. Please sign in again.')}if(!r.ok)throw new Error((j&&j.error)||'Request failed');return j}
+const note=(box,t,ok)=>{box.replaceChildren(h('div',{class:'msg '+(ok?'ok':'err'),role:'status'},t))};
+const sel=(opts,val,id)=>h('select',{id},opts.map(o=>{const[v,l]=Array.isArray(o)?o:[o,o];return h('option',{value:v,selected:String(v)===String(val)},l)}));
+const field=(label,el)=>{const id='f'+Math.random().toString(36).slice(2,8);el.id=id;return h('div',null,h('label',{for:id},label),el)};
+
+/* ---------- login ---------- */
+function login(msg){let email=h('input',{type:'email',autocomplete:'username',value:'ravidhiman8673@gmail.com'}),box=h('div'),step=1;
+ const code=h('input',{inputmode:'numeric',maxlength:'6',autocomplete:'one-time-code',placeholder:'6-digit code'}),f2=h('div',{hidden:true},field('Code from your email',code));
+ const go=h('button',{class:'btn pri',type:'button'},'Send code');
+ go.onclick=async()=>{try{if(step===1){await fetch('/api/admin/auth/request-otp',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:email.value})}).then(r=>{if(!r.ok)throw new Error('Could not request a code')});
+   step=2;f2.hidden=false;go.textContent='Verify and sign in';note(box,'If this address is allowed, a code has been sent. Enter it below.',true);code.focus()}
+  else{const r=await fetch('/api/admin/auth/verify-otp',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({email:email.value,code:code.value})});const j=await r.json();if(!r.ok)throw new Error(j.error||'Failed');CSRF=j.csrf;start()}}catch(e){note(box,e.message)}};
+ $app.replaceChildren(h('div',{class:'login'},h('h2',null,'Admin sign in'),h('p',{style:'color:var(--m)'},'Only the owner can sign in. A one-time code is sent to your email.'),msg?h('div',{class:'msg err'},msg):null,field('Email',email),f2,h('div',{style:'margin-top:14px'},go),box))}
+
+/* ---------- shell ---------- */
+let tab='content',DATA=[],SETS=null,curSec=null;
+async function start(){try{const me=await api('GET','/auth/me');CSRF=me.csrf}catch(_){return login()}render()}
+async function load(){DATA=await api('GET','/sections');if(!curSec||!DATA.find(s=>s.id===curSec))curSec=DATA[0]&&DATA[0].id}
+async function render(){const main=h('main',{id:'main'}),tabs=[['content','Content'],['sections','Sections'],['site','Site & hero'],['log','Activity']];
+ $app.replaceChildren(h('header',null,h('b',null,'ADMIN'),tabs.map(([k,l])=>h('button',{class:'tab','aria-selected':tab===k,onclick:()=>{tab=k;render()}},l)),h('a',{class:'btn',href:'/',target:'_blank',rel:'noopener'},'View site'),
+  h('button',{class:'btn',onclick:async()=>{try{await api('POST','/auth/logout',{})}catch(_){}CSRF='';login()}},'Sign out')),main);
+ try{await load();({content:viewContent,sections:viewSections,site:viewSite,log:viewLog})[tab](main)}catch(e){note(main,e.message)}}
+const confirmDel=m=>confirm(m);
+const refresh=()=>render();
+
+/* ---------- sections ---------- */
+function secForm(s,done){const box=h('div'),t=h('input',{value:s.title||''}),st=h('input',{value:s.street||''}),c=h('input',{type:'color',value:s.color||'#00e5ff'}),ic=sel(ICONS,s.icon||'folder'),ly=sel(LAYOUTS,s.layout||'list'),pub=h('input',{type:'checkbox',checked:s.published!==false});
+ const save=h('button',{class:'btn pri'},s.id?'Save section':'Add section');save.onclick=async()=>{try{const b={title:t.value,street:st.value,color:c.value,icon:ic.value,layout:ly.value,published:pub.checked};
+  s.id?await api('PATCH','/sections/'+s.id,b):await api('POST','/sections',b);done()}catch(e){note(box,e.message)}};
+ return h('div',{class:'card'},h('div',{class:'grid'},field('Section title',t),field('Road / street name (shown in Drive Mode)',st),field('Icon',ic),field('Layout',ly),h('div',null,h('label',null,'Accent colour'),c)),
+  h('label',{class:'chk'},pub,'Visible on the website'),h('div',{style:'margin-top:12px;display:flex;gap:8px'},save,s.id?h('button',{class:'btn',onclick:done},'Cancel'):null),box)}
+function viewSections(m){m.append(h('h2',null,'Sections'),h('p',{style:'color:var(--m)'},'Add, rename, reorder, hide or delete whole sections. Drive Mode builds one road per visible section.'));
+ const slot=h('div');m.append(slot);
+ const move=async(i,d)=>{const ids=DATA.map(x=>x.id),j=i+d;if(j<0||j>=ids.length)return;[ids[i],ids[j]]=[ids[j],ids[i]];await api('POST','/sections/reorder',{ids});refresh()};
+ DATA.forEach((s,i)=>m.append(h('div',{class:'row'+(s.published?'':' dim')},h('span',{style:'width:14px;height:14px;border-radius:4px;background:'+s.color}),h('div',{class:'g'},h('b',null,s.title),h('small',null,s.street+' · '+s.layout+' · '+s.items.length+' items'+(s.published?'':' · hidden'))),
+  h('button',{class:'btn sm','aria-label':'Move up',onclick:()=>move(i,-1)},'↑'),h('button',{class:'btn sm','aria-label':'Move down',onclick:()=>move(i,1)},'↓'),
+  h('button',{class:'btn sm',onclick:()=>slot.replaceChildren(secForm(s,refresh))},'Edit'),
+  h('button',{class:'btn sm del',onclick:async()=>{if(confirmDel('Delete the section "'+s.title+'" and its '+s.items.length+' items? This cannot be undone.')){try{await api('DELETE','/sections/'+s.id);refresh()}catch(e){alert(e.message)}}}},'Delete'))));
+ m.append(h('button',{class:'btn pri',onclick:()=>slot.replaceChildren(secForm({},refresh))},'+ Add section'))}
+
+/* ---------- content (items) ---------- */
+function itemForm(it,secs,done){const box=h('div'),t=h('input',{value:it.title||''}),b=h('textarea',null,it.body||''),d=h('textarea',null,it.details||''),ic=sel(ICONS,it.icon||'folder'),u=h('input',{value:it.url||'',placeholder:'https://… or mailto:…'}),pub=h('input',{type:'checkbox',checked:it.published!==false}),mv=sel(secs.map(s=>[s.id,s.title]),it.section_id);
+ const save=h('button',{class:'btn pri'},it.id?'Save':'Add');save.onclick=async()=>{try{const x={title:t.value,body:b.value,details:d.value,icon:ic.value,url:u.value,published:pub.checked};
+  if(it.id){x.section_id=Number(mv.value);await api('PATCH','/items/'+it.id,x)}else{x.section_id=it.section_id;await api('POST','/items',x)}done()}catch(e){note(box,e.message)}};
+ return h('div',{class:'card'},field('Title',t),field('Short text',b),field('Expanded details (shown when the row is opened; leave empty for none)',d),h('div',{class:'grid'},field('Icon',ic),field('Link (optional)',u)),it.id?field('Move to section',mv):null,
+  h('label',{class:'chk'},pub,'Visible on the website'),h('div',{style:'margin-top:12px;display:flex;gap:8px'},save,h('button',{class:'btn',onclick:done},'Cancel')),box)}
+function viewContent(m){if(!DATA.length){m.append(h('p',null,'No sections yet. Add one in the Sections tab.'));return}
+ const s=DATA.find(x=>x.id===curSec),pick=sel(DATA.map(x=>[x.id,x.title]),curSec);pick.addEventListener('change',()=>{curSec=Number(pick.value);render()});
+ m.append(h('h2',null,'Content'),field('Section',pick));const slot=h('div');m.append(slot);
+ const move=async(i,d)=>{const ids=s.items.map(x=>x.id),j=i+d;if(j<0||j>=ids.length)return;[ids[i],ids[j]]=[ids[j],ids[i]];await api('POST','/items/reorder',{section_id:s.id,ids});refresh()};
+ s.items.forEach((it,i)=>m.append(h('div',{class:'row'+(it.published?'':' dim')},h('div',{class:'g'},h('b',null,it.title),h('small',null,(it.body||'').slice(0,90)+(it.published?'':' · hidden'))),
+  h('button',{class:'btn sm','aria-label':'Move up',onclick:()=>move(i,-1)},'↑'),h('button',{class:'btn sm','aria-label':'Move down',onclick:()=>move(i,1)},'↓'),
+  h('button',{class:'btn sm',onclick:()=>slot.replaceChildren(itemForm(it,DATA,refresh))},'Edit'),
+  h('button',{class:'btn sm del',onclick:async()=>{if(confirmDel('Delete "'+it.title+'"?')){try{await api('DELETE','/items/'+it.id);refresh()}catch(e){alert(e.message)}}}},'Delete'))));
+ m.append(h('button',{class:'btn pri',onclick:()=>slot.replaceChildren(itemForm({section_id:s.id},DATA,refresh))},'+ Add item to '+s.title))}
+
+/* ---------- site settings ---------- */
+async function viewSite(m){const S=await api('GET','/settings'),box=h('div'),g=(o,k)=>h('input',{value:o[k]||''});
+ const st=g(S.site,'title'),sd=h('textarea',null,S.site.description||''),tag=g(S.hero,'tag'),nm=g(S.hero,'name'),ph=h('textarea',null,(S.hero.phrases||[]).join('\n')),ld=h('textarea',null,S.hero.lead||''),cta=g(S.hero,'cta'),rows=h('div');
+ const addSoc=(x={})=>{const l=h('input',{value:x.label||'',placeholder:'Label'}),i=sel(ICONS,x.icon||'folder'),u=h('input',{value:x.url||'',placeholder:'https://…'}),r=h('div',{class:'row','data-soc':true},h('div',{class:'g'},l),i,h('div',{class:'g'},u),h('button',{class:'btn sm del',onclick:()=>r.remove()},'Remove'));r._get=()=>({label:l.value,icon:i.value,url:u.value});rows.append(r)};(S.socials||[]).forEach(addSoc);
+ const save=h('button',{class:'btn pri'},'Save site settings');save.onclick=async()=>{try{await api('PUT','/settings',{site:{title:st.value,description:sd.value},hero:{tag:tag.value,name:nm.value,phrases:ph.value.split('\n'),lead:ld.value,cta:cta.value},socials:[...rows.children].map(r=>r._get())});note(box,'Saved. The public site picks this up within about 30 seconds.',true)}catch(e){note(box,e.message)}};
+ m.append(h('h2',null,'Site & hero'),h('div',{class:'card'},field('Browser title',st),field('Search description',sd),h('div',{class:'grid'},field('Hero greeting',tag),field('Your name',nm),field('Button label',cta)),field('Typing phrases (one per line)',ph),field('Hero paragraph',ld)),
+  h('h3',null,'Social & contact icons'),rows,h('button',{class:'btn',onclick:()=>addSoc()},'+ Add link'),h('div',{style:'margin-top:14px'},save),box)}
+async function viewLog(m){const l=await api('GET','/audit-log');m.append(h('h2',null,'Recent activity'),...l.map(e=>h('div',{class:'row'},h('b',null,e.action),h('div',{class:'g'},e.detail),h('small',null,new Date(e.created_at).toLocaleString()))))}
+start();
+</script></body></html>

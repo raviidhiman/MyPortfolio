@@ -1,0 +1,188 @@
+{
+ "page": "index.html",
+ "pass": 30,
+ "fail": 0,
+ "results": [
+  {
+   "id": "N1",
+   "name": "loads: h1, 7 sections, no console/page errors",
+   "result": "PASS",
+   "note": "errors=[]"
+  },
+  {
+   "id": "N2",
+   "name": "nav 'Contact' brings #contact fully into view",
+   "result": "PASS",
+   "note": "contact top=324 bottom=761 viewport=900 scrollY=3837/3837 (last section bottoms out; fully visible)"
+  },
+  {
+   "id": "N2b",
+   "name": "nav 'Home' scrolls to top",
+   "result": "PASS",
+   "note": ""
+  },
+  {
+   "id": "N3",
+   "name": "drawer opens; closes by Esc, outside click and link navigation",
+   "result": "PASS",
+   "note": "open=True esc=True outside=True link=True"
+  },
+  {
+   "id": "N4",
+   "name": "accordion rows toggle by click, Enter and Space",
+   "result": "PASS",
+   "note": "click-open=True click-close=True enter=True space=True"
+  },
+  {
+   "id": "N5",
+   "name": "search: answer + section chips; no-hit message; Esc clears",
+   "result": "PASS",
+   "note": "chips=1 nohit='I couldn't find that on the portfolio ye' cleared=True answer_is_retrieval_fallback=True"
+  },
+  {
+   "id": "N6",
+   "name": "guided tour starts and stops on user scroll",
+   "result": "PASS",
+   "note": "started=True stopped_by_wheel=True"
+  },
+  {
+   "id": "N7",
+   "name": "typewriter animates (motion allowed)",
+   "result": "PASS",
+   "note": "'AI ' -> 'AI & ML solution'"
+  },
+  {
+   "id": "N8",
+   "name": "mailto row triggers copy toast",
+   "result": "PASS",
+   "note": "mailto=mailto:you@example.com (placeholder in prototype) toast=True"
+  },
+  {
+   "id": "N9",
+   "name": "external links open with target=_blank rel~noopener",
+   "result": "PASS",
+   "note": ""
+  },
+  {
+   "id": "N10",
+   "name": "admin-login stub modal opens/closes",
+   "result": "PASS",
+   "note": "stub modal says backend not connected"
+  },
+  {
+   "id": "N11",
+   "name": "scroll progress bar + section dots update",
+   "result": "PASS",
+   "note": ""
+  },
+  {
+   "id": "N12",
+   "name": "reduced-motion: typewriter shows full static text",
+   "result": "PASS",
+   "note": ""
+  },
+  {
+   "id": "N13",
+   "name": "mobile 390px: no horizontal overflow",
+   "result": "PASS",
+   "note": "overflow_px=0"
+  },
+  {
+   "id": "S1",
+   "name": "screenshots: 3 viewports x (home + 7 sections + drawer)",
+   "result": "PASS",
+   "note": ""
+  },
+  {
+   "id": "A1",
+   "name": "axe-core scan of normal mode (informational)",
+   "result": "PASS",
+   "note": "violations (informational, not pass/fail): region[moderate]x1"
+  },
+  {
+   "id": "D1",
+   "name": "Drive Mode starts; chooser shown; page scroll locked",
+   "result": "PASS",
+   "note": "choose_overlay=True body_overflow=hidden"
+  },
+  {
+   "id": "D2",
+   "name": "WebGL canvas renders non-blank",
+   "result": "PASS",
+   "note": "png_bytes=180745"
+  },
+  {
+   "id": "D3",
+   "name": "W accelerates, Space brakes",
+   "result": "PASS",
+   "note": "speed_after_gas=74km/h after_brake=0km/h"
+  },
+  {
+   "id": "D4",
+   "name": "C cycles through 4 camera modes",
+   "result": "PASS",
+   "note": "titles=Switch camera | Camera: Chase \u00b7 Far | Camera: Hood | Camera: Cockpit | Camera: Chase \u00b7 Close"
+  },
+  {
+   "id": "D5",
+   "name": "fast travel via button and mini-map; lands on Projects Street",
+   "result": "PASS",
+   "note": "list_open=True street='Projects Street' minimap_toggle=True"
+  },
+  {
+   "id": "D6",
+   "name": "near a sign: info pill -> detail panel -> Keep driving",
+   "result": "PASS",
+   "note": "pill=True panel=True keep_driving_closes=True (position set via internal state: white-box)"
+  },
+  {
+   "id": "D7",
+   "name": "'Open in Normal Mode' exits Drive and scrolls to the section",
+   "result": "PASS",
+   "note": "drive_off=True scroll_unlocked=True at_projects=True"
+  },
+  {
+   "id": "D8",
+   "name": "car switch and sound toggle",
+   "result": "PASS",
+   "note": "car 'Car: G-Wagon' -> 'Car: Sports'; sound icon toggles=True"
+  },
+  {
+   "id": "D9",
+   "name": "no network calls during render loop (fetch/XHR/beacon/WS)",
+   "result": "PASS",
+   "note": "script-initiated network calls while driving=0; frames=42 p50=150.0ms p95=183.3ms (software GL)"
+  },
+  {
+   "id": "D10",
+   "name": "Esc exits Drive Mode",
+   "result": "PASS",
+   "note": "Esc exits Drive, restores scrolling"
+  },
+  {
+   "id": "D11",
+   "name": "no console/page errors during Drive session",
+   "result": "PASS",
+   "note": "errors=[]"
+  },
+  {
+   "id": "D13",
+   "name": "touch device: pedals visible; GAS accelerates",
+   "result": "PASS",
+   "note": "pedals_visible=True speed_with_GAS=107km/h"
+  },
+  {
+   "id": "F1",
+   "name": "CDN blocked -> stays in Normal Mode (via alert)",
+   "result": "PASS",
+   "note": "alert shown=['Could not load 3D engine. Staying in Normal Mode.'] (BASELINE DEFECT vs Blueprint: uses blocking alert())"
+  },
+  {
+   "id": "F2",
+   "name": "no window.claude runtime -> search still answers via retrieval",
+   "result": "PASS",
+   "note": ""
+  }
+ ],
+ "ran_at": "2026-10-06 04:26:15"
+}

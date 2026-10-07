@@ -3,6 +3,6 @@
   "id": "D12",
   "name": "auto tour reaches 'Tour complete' (Next clicked at each stop to skip waits)",
   "result": "PASS",
-  "note": "panels seen=['About \u00b7 1/7', 'Skills \u00b7 2/7', 'Projects \u00b7 3/7', 'Experience \u00b7 4/7', 'Education \u00b7 5/7', 'Research \u00b7 6/7', 'Contact \u00b7 7/7', 'Tour complete'] elapsed=285s of 1500s budget (software GL ~7fps => sim runs slower than real time)"
+  "note": "panels seen=['About \u00b7 1/7', 'Skills \u00b7 2/7', 'Projects \u00b7 3/7', 'Experience \u00b7 4/7', 'Education \u00b7 5/7', 'Research \u00b7 6/7', 'Contact \u00b7 7/7', 'Tour complete'] elapsed=243s of 900s budget (software GL ~7fps => sim runs slower than real time)"
  }
 ]

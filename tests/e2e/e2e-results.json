@@ -1,0 +1,74 @@
+[
+ {
+  "id": "E1",
+  "name": "public page renders 7 sections from the API with profile content, no placeholders, no errors",
+  "result": "PASS",
+  "note": "errors=[]"
+ },
+ {
+  "id": "E2",
+  "name": "hero, socials and links come from settings",
+  "result": "PASS",
+  "note": ""
+ },
+ {
+  "id": "E3",
+  "name": "accordion project rows open and show details",
+  "result": "PASS",
+  "note": ""
+ },
+ {
+  "id": "E4",
+  "name": "admin signs in via emailed one-time code (dev log); session cookie is HttpOnly",
+  "result": "PASS",
+  "note": ""
+ },
+ {
+  "id": "E5",
+  "name": "admin adds a new section (Sections tab)",
+  "result": "PASS",
+  "note": ""
+ },
+ {
+  "id": "E6",
+  "name": "admin adds an item (including hostile HTML)",
+  "result": "PASS",
+  "note": ""
+ },
+ {
+  "id": "E7",
+  "name": "public site shows the new section (8 total) and renders hostile text inertly",
+  "result": "PASS",
+  "note": "errors=[]"
+ },
+ {
+  "id": "E8",
+  "name": "Drive Mode builds 8 roads for 8 sections, drives, fast-travels to the new street",
+  "result": "PASS",
+  "note": "S/fast/A=[8, 8, 8] speed=32 street='Awards Alley' errors=[]"
+ },
+ {
+  "id": "E9",
+  "name": "admin deletes the section (with confirmation)",
+  "result": "PASS",
+  "note": ""
+ },
+ {
+  "id": "E10",
+  "name": "public site is back to 7 sections",
+  "result": "PASS",
+  "note": ""
+ },
+ {
+  "id": "E11",
+  "name": "sign out returns to login",
+  "result": "PASS",
+  "note": ""
+ },
+ {
+  "id": "E12",
+  "name": "after sign-out the admin API returns 401",
+  "result": "PASS",
+  "note": "status=401"
+ }
+]
