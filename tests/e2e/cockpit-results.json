@@ -1,0 +1,50 @@
+[
+ {
+  "id": "C1",
+  "name": "cockpit camera is the default and the dashboard layer is on",
+  "result": "PASS",
+  "note": ""
+ },
+ {
+  "id": "C2",
+  "name": "right turn: front wheels point right (negative yaw), body rolls so the outer (left) side is lower",
+  "result": "PASS",
+  "note": "{\"STR\": 1, \"roll\": -0.0118, \"left_side_y\": 0.988, \"right_side_y\": 1.012, \"front_wheel_yaw_deg\": -45}"
+ },
+ {
+  "id": "C3",
+  "name": "wheels spin by about v*t/r",
+  "result": "PASS",
+  "note": "9.92 vs 10"
+ },
+ {
+  "id": "C4",
+  "name": "hard braking dips the nose (front lower than rear)",
+  "result": "PASS",
+  "note": "{\"pitch\": 0.0365, \"front_y\": 0.912, \"rear_y\": 1.087}"
+ },
+ {
+  "id": "C5",
+  "name": "wheel turns 1.5 rounds (540 deg) each way and stops at the lock",
+  "result": "PASS",
+  "note": "{\"after_540\": [1, \"rotate(540deg)\"], \"after_extra_180\": [1, \"rotate(540deg)\"], \"after_reverse_1080\": [-1, \"rotate(-540deg)\"]}"
+ },
+ {
+  "id": "C6",
+  "name": "coins: 35 placed; driving into one collects it and updates the counter",
+  "result": "PASS",
+  "note": "[35, 1, '\u2605 1 / 35', False]"
+ },
+ {
+  "id": "C7",
+  "name": "no script errors in the new build",
+  "result": "PASS",
+  "note": "[]"
+ },
+ {
+  "id": "S1",
+  "name": "engine output: new build is quieter than the old and never clips",
+  "result": "PASS",
+  "note": "old peak=0.536 (-5.4 dBFS) rms=0.162 (-15.8 dBFS) | new peak=0.239 (-12.4 dBFS) rms=0.076 (-22.4 dBFS)"
+ }
+]

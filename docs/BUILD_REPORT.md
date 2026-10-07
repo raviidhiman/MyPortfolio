@@ -69,3 +69,20 @@ Steering uses a bicycle model with a 45 degree maximum wheel lock, reduced with 
 **Car.** The G-Wagon is restyled (silver paint, glowing ring headlights, lit grille slats) from primitive shapes. It is a stylised low-poly model, not a licensed or scanned real model; your photo was used only as a style reference. Real models need a model file (.glb) you have the right to use.
 
 **Known gaps:** project rows with buttons nest links inside a role=button row (screen-reader behavior untested); Sports and Sedan keep their old shapes; no mobile-device testing.
+
+
+## Round 3 (2026-10-07): cockpit, sound, steering, coins
+
+Results on the final build: API 16/16, admin end-to-end 12/12, features 18/18, cockpit/physics/sound 8/8, regression 30/30, strict auto tour pass (all 7 stops, top auto speed 84 km/h).
+
+**Sound.** Engine output measured with an audio analyser, same drive on old and new code: old peak -6.6 dBFS / RMS -16.3 dBFS, new peak -12.4 dBFS / RMS -22.3 dBFS (about 6 dB quieter, peak about 0.24, no clipping in either). Changes: square wave replaced by triangle, filter resonance cut, a compressor/limiter and master gain added, and the engine "burble" modulation can no longer exceed the base level (it could previously push the gain negative, which flips the waveform). Crash sound reduced. **The measurement shows level, not how it sounds: I could not listen, so whether the distortion you heard is gone is unverified.**
+
+**Cockpit.** Dashboard drawn on canvas in the style of your reference: hood in the car's paint colour, speedometer (km/h), fuel gauge, blinking turn arrows (follow the steering), hazard triangle, P/R/N/D. The fuel gauge and the N/hazard lights are cosmetic. Wheel: black three-spoke design, 540 degrees each way (assumed meaning of "one and a half rounds"; the constant is 540 in two places in tools/patch_v3.py), stops at the lock. Pedals: ribbed rubber brake (left) and gas (right).
+
+**Physics visuals (checked numerically).** Front wheels yaw up to 45 degrees (negative yaw = right turn), all wheels spin at v*t/r (9.92 vs 10 expected), the body rolls so the outer side is lower, and the nose dips when braking.
+
+**Coins.** 5 per road (35 with 7 sections), collected by driving through, with a counter and a chime.
+
+**Not done.** (1) The map is still the roundabout-with-spokes layout; changing it affects collisions, the mini-map, signs, fast travel and the auto tour, so it needs its own phase and a decision on the layout you want. (2) The car is still a procedural model; a photoreal car needs a model file (.glb) you have the right to use, plus a loader. (3) Only the G-Wagon was restyled; the Sports and Sedan keep their old shapes.
+
+**Test fixes made along the way:** the typewriter check was timing-sensitive and now samples over 6 seconds; the auto-tour check could double-click "Next" and skip a stop, so it now clicks once per stop and requires all 7 stops. A real bug was also found and fixed: steering past the lock kept counting, so reversing needed extra turns to unwind.

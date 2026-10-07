@@ -49,7 +49,7 @@
    "id": "N7",
    "name": "typewriter animates (motion allowed)",
    "result": "PASS",
-   "note": "'AI & ML solut' -> 'AI & ML solutions'"
+   "note": "12 distinct states in 6s, e.g. ['AI & ', 'AI & ML s', 'AI & ML solut', 'AI & ML solutions']"
   },
   {
    "id": "N8",
@@ -109,19 +109,19 @@
    "id": "D2",
    "name": "WebGL canvas renders non-blank",
    "result": "PASS",
-   "note": "png_bytes=82352"
+   "note": "png_bytes=152216"
   },
   {
    "id": "D3",
    "name": "W accelerates, Space brakes",
    "result": "PASS",
-   "note": "speed_after_gas=8km/h after_brake=0km/h"
+   "note": "speed_after_gas=21km/h after_brake=0km/h"
   },
   {
    "id": "D4",
    "name": "C cycles through 4 camera modes",
    "result": "PASS",
-   "note": "titles=Switch camera | Camera: Chase \u00b7 Far | Camera: Hood | Camera: Cockpit | Camera: Chase \u00b7 Close"
+   "note": "titles=Camera: Cockpit | Camera: Chase \u00b7 Close | Camera: Chase \u00b7 Far | Camera: Hood | Camera: Cockpit"
   },
   {
    "id": "D5",
@@ -151,7 +151,7 @@
    "id": "D9",
    "name": "no network calls during render loop (fetch/XHR/beacon/WS)",
    "result": "PASS",
-   "note": "script-initiated network calls while driving=0; frames=16 p50=450.0ms p95=483.3ms (software GL)"
+   "note": "script-initiated network calls while driving=0; frames=33 p50=200.0ms p95=216.7ms (software GL)"
   },
   {
    "id": "D10",
@@ -169,7 +169,7 @@
    "id": "D13",
    "name": "touch device: pedals visible; GAS accelerates",
    "result": "PASS",
-   "note": "pedals_visible=True speed_with_GAS=11km/h"
+   "note": "pedals_visible=True speed_with_GAS=34km/h"
   },
   {
    "id": "F1",
@@ -184,5 +184,5 @@
    "note": ""
   }
  ],
- "ran_at": "2026-10-07 06:06:09"
+ "ran_at": "2026-10-07 10:40:42"
 }

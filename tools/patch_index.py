@@ -100,4 +100,6 @@ js=repl_line(js,"function audioUpd(","function audioUpd(g,sp){if(!AC||!EN)return
 js=once(js,"{n:'G-Wagon',g:1,c:0x14161a,","{n:'G-Wagon',g:1,c:0xb9bdc4,")
 js=once(js,"car.add(sp)}","car.add(sp);[-.65,.65].forEach(x=>{const r=new THREE.Mesh(new THREE.TorusGeometry(.27,.035,8,28),new THREE.MeshBasicMaterial({color:0xe9f6ff}));r.position.set(x,1.0,d.L/2+.14);car.add(r)});[0,1,2,3,4].forEach(k=>{const m=new THREE.Mesh(new THREE.BoxGeometry(1.0,.03,.03),new THREE.MeshBasicMaterial({color:0xcfe3f5}));m.position.set(0,.8+k*.08,d.L/2+.17);car.add(m)})}")
 
+import sys,os;sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)));import patch_v3
+js=patch_v3.apply(js,once,repl_line)
 open('index.html','w',encoding='utf8').write(js); print('patched ok; bytes',len(js.encode()))

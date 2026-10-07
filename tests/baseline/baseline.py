@@ -129,8 +129,12 @@ def main():
             return (on and off, f"started={on} stopped_by_wheel={off}")
         check("N6", "guided tour starts and stops on user scroll", tour)
         def ty():
-            a = ev(p, "document.getElementById('ty').textContent"); p.wait_for_timeout(900); c = ev(p, "document.getElementById('ty').textContent")
-            return (a != c, f"'{a}' -> '{c}'")
+            seen = []
+            for _ in range(20):
+                t = ev(p, "document.getElementById('ty').textContent")
+                if not seen or seen[-1] != t: seen.append(t)
+                p.wait_for_timeout(300)
+            return (len(seen) >= 3, f"{len(seen)} distinct states in 6s, e.g. {seen[:4]}")
         check("N7", "typewriter animates (motion allowed)", ty)
         def mail():
             href = ev(p, "document.querySelector('#contact a[href^=mailto]').getAttribute('href')")

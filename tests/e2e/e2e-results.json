@@ -45,7 +45,7 @@
   "id": "E8",
   "name": "Drive Mode builds 8 roads for 8 sections, drives, fast-travels to the new street",
   "result": "PASS",
-  "note": "S/fast/A=[8, 8, 8] speed=7 street='Awards Alley' errors=[]"
+  "note": "S/fast/A=[8, 8, 8] speed=5 street='Awards Alley' errors=[]"
  },
  {
   "id": "E9",

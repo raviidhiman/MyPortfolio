@@ -51,7 +51,7 @@
   "id": "Q:does he know rust",
   "name": "assistant answer contains 'don't see'",
   "result": "PASS",
-  "note": "I don't see doe, rust listed on the portfolio."
+  "note": "I don't see rust listed on the portfolio."
  },
  {
   "id": "Q:tell me about threadsource",

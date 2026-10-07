@@ -30,6 +30,7 @@ Tables are created and your profile content is seeded automatically on first sta
     cd server && npm test                                        # 16 API tests, real PostgreSQL (TEST_DATABASE_URL to override)
     E2E_URL=http://127.0.0.1:3100 E2E_LOG=/tmp/server.log python3 tests/e2e/e2e.py     # 12 browser tests (admin UI + public + Drive)
     python3 tests/e2e/features.py                                 # project buttons + 12 assistant questions (needs tools/dev.sh running)
+    python3 tests/e2e/cockpit.py                                  # cockpit, 540-degree wheel, wheel/body physics, coins, engine loudness (needs: git show HEAD~1:index.html > /tmp/old.html)
     python3 tests/e2e/physics.py                                  # measures the page's own driving physics
     python3 tests/baseline/baseline.py index.html                # 30 regression checks of the original behavior (offline fallback path)
     AUTOTOUR_BUDGET=900 python3 tests/baseline/autotour.py       # Drive Mode auto tour
@@ -52,6 +53,12 @@ In production the server refuses to start without `OTP_SECRET` and never prints 
 | `tools/` | `patch_index.py` (how the prototype was made data-driven), `dev.sh` |
 | `tests/` | Baseline regression, end-to-end, vendored Three.js/axe for offline testing, screenshots |
 | `docs/` | Phase 0 report, content reconciliation, baseline report |
+
+## Drive Mode (cockpit)
+
+Drive Mode now starts in a cockpit view: body-colour hood, speedometer, fuel gauge (cosmetic), blinking indicators, hazard triangle and P/R/N/D (cosmetic),
+a steering wheel that turns 1.5 rounds each way, ribbed brake and gas pedals, front wheels that steer and spin, body roll and nose dive,
+and 5 collectible coins per road with a live counter. Press the camera button to switch to chase or hood views.
 
 ## Not built yet
 
