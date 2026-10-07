@@ -41,6 +41,9 @@ const itemIn = (b, partial) => {
   if (has('details')) o.details = str(b.details, 4000, 'details');
   if (has('icon')) o.icon = icon(b.icon || 'folder');
   if (has('url')) o.url = url(b.url, 'link');
+  if (has('live_url')) o.live_url = url(b.live_url, 'live link');
+  if (has('repo_url')) o.repo_url = url(b.repo_url, 'GitHub link');
+  if (has('doc_url')) o.doc_url = url(b.doc_url, 'document link');
   if (b.published !== undefined) o.published = !!b.published;
   return o;
 };
@@ -86,7 +89,7 @@ function createApp({ pool, mail }) {
   app.get('/api/public/content', wrap(async (req, res) => {
     const st = await q('select key,value from settings'), settings = Object.fromEntries(st.rows.map(r => [r.key, r.value]));
     const secs = await q('select id,slug,title,street,color,icon,layout from sections where published order by position,id');
-    const its = await q('select i.section_id,i.title,i.body,i.details,i.icon,i.url from items i join sections s on s.id=i.section_id where i.published and s.published order by i.position,i.id');
+    const its = await q('select i.section_id,i.title,i.body,i.details,i.icon,i.url,i.live_url,i.repo_url,i.doc_url from items i join sections s on s.id=i.section_id where i.published and s.published order by i.position,i.id');
     const sections = secs.rows.map(s => ({ ...s, items: its.rows.filter(i => i.section_id === s.id).map(({ section_id, ...i }) => i) }));
     res.set('Cache-Control', 'public, max-age=30').json({ settings, sections });
   }));
@@ -178,8 +181,8 @@ function createApp({ pool, mail }) {
     const o = itemIn(req.body), sid = Number(req.body.section_id);
     if (!(await q('select 1 from sections where id=$1', [sid])).rowCount) throw bad('section not found');
     const pos = (await q('select coalesce(max(position),0)+1 p from items where section_id=$1', [sid])).rows[0].p;
-    const r = await q('insert into items(section_id,title,body,details,icon,url,position,published) values($1,$2,$3,$4,$5,$6,$7,$8) returning *',
-      [sid, o.title, o.body, o.details, o.icon, o.url, pos, o.published !== false]);
+    const r = await q('insert into items(section_id,title,body,details,icon,url,live_url,repo_url,doc_url,position,published) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) returning *',
+      [sid, o.title, o.body, o.details, o.icon, o.url, o.live_url || '', o.repo_url || '', o.doc_url || '', pos, o.published !== false]);
     await audit('item.create', o.title); res.status(201).json(r.rows[0]);
   }));
   A.patch('/items/:id', wrap(async (req, res) => {

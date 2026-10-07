@@ -7,6 +7,7 @@ through a Node/Express API, and you manage everything from `/admin`.
 
 * **Sections:** add, rename, reorder, hide, delete whole sections (title, street name used in Drive Mode, colour, icon, layout).
 * **Content:** add, edit, reorder, hide, delete items inside any section, and move an item to another section.
+* **Project buttons:** each item has optional **Live**, **GitHub** and **Docs** links (Docs is a link to a PDF / Google Doc / Notion page; file upload is not built). A small button appears on the site only for links you fill in; clicking the project box or + only expands it.
 * **Site & hero:** browser title, search description, greeting, name, typing phrases, hero paragraph, button label, and the social/contact icons.
 * **Activity:** audit log of every change and sign-in.
 * Sign-in is by one-time code emailed to `ADMIN_EMAIL` only. Changes appear on the public site within about 30 seconds.
@@ -26,8 +27,10 @@ Tables are created and your profile content is seeded automatically on first sta
 
 ## Tests
 
-    cd server && npm test                                        # 14 API tests, real PostgreSQL (TEST_DATABASE_URL to override)
+    cd server && npm test                                        # 16 API tests, real PostgreSQL (TEST_DATABASE_URL to override)
     E2E_URL=http://127.0.0.1:3100 E2E_LOG=/tmp/server.log python3 tests/e2e/e2e.py     # 12 browser tests (admin UI + public + Drive)
+    python3 tests/e2e/features.py                                 # project buttons + 12 assistant questions (needs tools/dev.sh running)
+    python3 tests/e2e/physics.py                                  # measures the page's own driving physics
     python3 tests/baseline/baseline.py index.html                # 30 regression checks of the original behavior (offline fallback path)
     AUTOTOUR_BUDGET=900 python3 tests/baseline/autotour.py       # Drive Mode auto tour
 
@@ -53,5 +56,5 @@ In production the server refuses to start without `OTP_SECRET` and never prints 
 ## Not built yet
 
 Contact form with stored messages and email notification, visitor analytics and consent notice, AI assistant over your content
-(RAG), deployment to a live host, and real-Brevo / real-LLM verification. The page's search box still uses on-page retrieval only.
+(LLM/RAG; the search box now uses a rule-based answer composer, not an AI model), document file upload, deployment to a live host, and real-Brevo / real-LLM verification. The page's search box still uses on-page retrieval only.
 The seed/fallback content is the profile document as written; fields it marked "confirm" are shown without badges, as you asked.

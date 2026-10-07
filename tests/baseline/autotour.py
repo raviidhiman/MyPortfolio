@@ -12,15 +12,15 @@ with sync_playwright() as pw:
     ctx = B.new_ctx(b, 480, 270); B.route_three(ctx); p = B.open_page(ctx)
     def run():
         p.click("#bDrive"); p.wait_for_function("window.THREE && document.getElementById('drive').classList.contains('on')", timeout=30000); p.wait_for_timeout(800)
-        p.click("#cAuto"); seen = []; t0 = time.time(); done = False; budget = int(os.environ.get("AUTOTOUR_BUDGET", "240"))
+        mx = [0]; p.click("#cAuto"); seen = []; t0 = time.time(); done = False; budget = int(os.environ.get("AUTOTOUR_BUDGET", "240"))
         while time.time() - t0 < budget:
-            p.wait_for_timeout(500)
+            p.wait_for_timeout(500); mx[0] = max(mx[0], B.ev(p, 'Math.round(Math.abs(v)*4)'))
             h = B.ev(p, "(document.querySelector('#panel h3')||{}).textContent||''")
             if h and (not seen or seen[-1] != h): seen.append(h.strip())
             if "Tour complete" in h: done = True; break
             if B.ev(p, "document.getElementById('panel').classList.contains('on') && !!document.getElementById('aNext')"): p.click("#aNext")
         if done: p.screenshot(path=os.path.join(B.SHOTS, "drive-30-tour-complete.png"))
-        return (done, f"panels seen={seen} elapsed={time.time()-t0:.0f}s of {budget}s budget (software GL ~7fps => sim runs slower than real time)")
+        return (done, f"panels seen={seen} top_auto_speed={mx[0]}km/h elapsed={time.time()-t0:.0f}s of {budget}s budget (software GL ~7fps => sim runs slower than real time)")
     B.check("D12", "auto tour reaches 'Tour complete' (Next clicked at each stop to skip waits)", run)
     b.close()
 srv.shutdown()

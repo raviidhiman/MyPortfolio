@@ -15,7 +15,7 @@ before(async () => {
 });
 after(async () => { srv.close(); await pool.end(); });
 
-test('migrations apply from empty DB and are idempotent', async () => { await migrate(pool); assert.equal((await pool.query('select count(*)::int c from schema_migrations')).rows[0].c, 1); });
+test('migrations apply from empty DB and are idempotent', async () => { await migrate(pool); assert.equal((await pool.query('select count(*)::int c from schema_migrations')).rows[0].c, 2); });
 test('public content: 7 seeded sections, no private fields', async () => {
   const { s, j } = await call('GET', '/api/public/content', null, { cookie: false });
   assert.equal(s, 200); assert.equal(j.sections.length, 7); assert.equal(j.settings.hero.name, 'Ravi Dhiman');
@@ -82,6 +82,16 @@ test('validation rejects bad input; SQL injection text is stored inertly', async
   assert.equal(r.s, 201); assert.equal((await pool.query('select title from items where id=$1', [r.j.id])).rows[0].title, inj);
   assert.equal((await call('POST', '/api/admin/items', { section_id: 99999, title: 't' })).s, 400);
 });
+test('project buttons: live/GitHub/docs links save, appear publicly, and are validated', async () => {
+  const proj = (await call('GET', '/api/admin/sections')).j.find(s => s.layout === 'projects');
+  const r = await call('POST', '/api/admin/items', { section_id: proj.id, title: 'Link test', live_url: 'https://live.example.com', repo_url: 'https://github.com/x/y', doc_url: 'https://docs.example.com/a.pdf' });
+  assert.equal(r.s, 201); assert.equal(r.j.repo_url, 'https://github.com/x/y');
+  const pub = (await call('GET', '/api/public/content', null, { cookie: false })).j.sections.find(s => s.layout === 'projects').items.find(i => i.title === 'Link test');
+  assert.deepEqual([pub.live_url, pub.repo_url, pub.doc_url], ['https://live.example.com', 'https://github.com/x/y', 'https://docs.example.com/a.pdf']);
+  for (const k of ['live_url', 'repo_url', 'doc_url']) assert.equal((await call('PATCH', '/api/admin/items/' + r.j.id, { [k]: 'javascript:alert(1)' })).s, 400, k);
+  assert.equal((await call('PATCH', '/api/admin/items/' + r.j.id, { repo_url: '' })).j.repo_url, '');
+  await call('DELETE', '/api/admin/items/' + r.j.id);
+});
 test('settings update validates and appears publicly', async () => {
   const cur = (await call('GET', '/api/admin/settings')).j; cur.hero.name = 'Ravi D.'; assert.equal((await call('PUT', '/api/admin/settings', cur)).s, 200);
   assert.equal((await call('GET', '/api/public/content', null, { cookie: false })).j.settings.hero.name, 'Ravi D.');
@@ -101,4 +111,16 @@ test('security headers present; oversized body rejected; health ok', async () =>
   const r = await call('GET', '/api/health', null, { cookie: false }); assert.equal(r.s, 200);
   assert.equal(r.r.headers.get('x-content-type-options'), 'nosniff'); assert.match(r.r.headers.get('content-security-policy'), /frame-ancestors 'none'/);
   assert.equal((await call('POST', '/api/admin/auth/request-otp', { email: 'a'.repeat(200000) }, { cookie: false, csrf: false })).s, 413);
+});
+test('migration 002 moves a project row link to the Live button', async () => {
+  const fs = require('fs'), path = require('path'), p2 = new Pool({ connectionString: URL_ });
+  await p2.query('drop schema public cascade; create schema public');
+  await p2.query(fs.readFileSync(path.join(__dirname, '../migrations/001_init.sql'), 'utf8'));
+  const sec = (await p2.query("insert into sections(slug,title,street,layout) values('p','P','P St','projects'),('c','C','C St','contact') returning id")).rows;
+  await p2.query("insert into items(section_id,title,url) values($1,'proj','https://a.example'),($2,'mail','mailto:a@b.co')", [sec[0].id, sec[1].id]);
+  await p2.query(fs.readFileSync(path.join(__dirname, '../migrations/002_item_links.sql'), 'utf8'));
+  const r = (await p2.query('select title,url,live_url from items order by id')).rows;
+  assert.deepEqual(r, [{ title: 'proj', url: '', live_url: 'https://a.example' }, { title: 'mail', url: 'mailto:a@b.co', live_url: '' }]);
+  await p2.query('drop schema public cascade; create schema public'); await p2.end();
+  await migrate(pool); await seed(pool);   // restore for the remaining tests
 });

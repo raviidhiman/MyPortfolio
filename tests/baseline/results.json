@@ -49,7 +49,7 @@
    "id": "N7",
    "name": "typewriter animates (motion allowed)",
    "result": "PASS",
-   "note": "'AI &' -> 'AI & ML solutions'"
+   "note": "'AI & ML solut' -> 'AI & ML solutions'"
   },
   {
    "id": "N8",
@@ -109,13 +109,13 @@
    "id": "D2",
    "name": "WebGL canvas renders non-blank",
    "result": "PASS",
-   "note": "png_bytes=166351"
+   "note": "png_bytes=82352"
   },
   {
    "id": "D3",
    "name": "W accelerates, Space brakes",
    "result": "PASS",
-   "note": "speed_after_gas=61km/h after_brake=0km/h"
+   "note": "speed_after_gas=8km/h after_brake=0km/h"
   },
   {
    "id": "D4",
@@ -151,7 +151,7 @@
    "id": "D9",
    "name": "no network calls during render loop (fetch/XHR/beacon/WS)",
    "result": "PASS",
-   "note": "script-initiated network calls while driving=0; frames=35 p50=166.7ms p95=250.0ms (software GL)"
+   "note": "script-initiated network calls while driving=0; frames=16 p50=450.0ms p95=483.3ms (software GL)"
   },
   {
    "id": "D10",
@@ -169,7 +169,7 @@
    "id": "D13",
    "name": "touch device: pedals visible; GAS accelerates",
    "result": "PASS",
-   "note": "pedals_visible=True speed_with_GAS=93km/h"
+   "note": "pedals_visible=True speed_with_GAS=11km/h"
   },
   {
    "id": "F1",
@@ -184,5 +184,5 @@
    "note": ""
   }
  ],
- "ran_at": "2026-10-06 14:07:41"
+ "ran_at": "2026-10-07 06:06:09"
 }

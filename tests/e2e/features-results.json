@@ -1,0 +1,110 @@
+[
+ {
+  "id": "F1",
+  "name": "buttons appear only for links that exist (3, 1, 0, ...)",
+  "result": "PASS",
+  "note": "counts=[3, 1, 0, 0, 0]"
+ },
+ {
+  "id": "F2",
+  "name": "project rows are no longer links",
+  "result": "PASS",
+  "note": ""
+ },
+ {
+  "id": "F3",
+  "name": "clicking the project box/plus expands it and opens nothing",
+  "result": "PASS",
+  "note": "popups=0"
+ },
+ {
+  "id": "F4",
+  "name": "GitHub button opens only the repo link, row stays open",
+  "result": "PASS",
+  "note": "opened=https://github.com/x/a"
+ },
+ {
+  "id": "F5",
+  "name": "Docs button opens the document link",
+  "result": "PASS",
+  "note": "https://docs.example.com/a"
+ },
+ {
+  "id": "F6",
+  "name": "no script errors",
+  "result": "PASS",
+  "note": "[]"
+ },
+ {
+  "id": "Q:what is his email",
+  "name": "assistant answer contains 'ravidhiman8673@gmail.com'",
+  "result": "PASS",
+  "note": "You can reach Ravi here \u2014 Email: ravidhiman8673@gmail.com; GitHub: github.com/raviidhiman; LinkedIn: linkedin.com/in/raviidhiman; Instagram: @ravii.dhiman."
+ },
+ {
+  "id": "Q:does he know react",
+  "name": "assistant answer contains 'Yes'",
+  "result": "PASS",
+  "note": "Yes \u2014 react appears in the About section (Who I am)."
+ },
+ {
+  "id": "Q:does he know rust",
+  "name": "assistant answer contains 'don't see'",
+  "result": "PASS",
+  "note": "I don't see doe, rust listed on the portfolio."
+ },
+ {
+  "id": "Q:tell me about threadsource",
+  "name": "assistant answer contains 'ThreadSource'",
+  "result": "PASS",
+  "note": "No GitHub link has been added for ThreadSource \u2014 B2B Textile Marketplace yet."
+ },
+ {
+  "id": "Q:github of threadsource",
+  "name": "assistant answer contains 'ThreadSource'",
+  "result": "PASS",
+  "note": "No GitHub link has been added for ThreadSource \u2014 B2B Textile Marketplace yet."
+ },
+ {
+  "id": "Q:what is his education",
+  "name": "assistant answer contains 'MCA'",
+  "result": "PASS",
+  "note": "MCA \u2014 Artificial Intelligence & Machine Learning (Chaudhary Ranbir Singh University (CRSU), Jind \u00b7 2024\u20132026 \u00b7 CGPA 8); BCA \u2014 Computer Applications (2019\u20132022 \u00b7 68%); Cla"
+ },
+ {
+  "id": "Q:which projects has he built",
+  "name": "assistant answer contains 'Remote Job'",
+  "result": "PASS",
+  "note": "Ravi's projects: Remote Job Market Pipeline; Olist Brazilian E-commerce Analytics; ThreadSource \u2014 B2B Textile Marketplace; Brain Stroke Risk Prediction; Liverr \u2014 Freelanc"
+ },
+ {
+  "id": "Q:linkedin",
+  "name": "assistant answer contains 'linkedin.com'",
+  "result": "PASS",
+  "note": "Ravi's LinkedIn: https://www.linkedin.com/in/raviidhiman"
+ },
+ {
+  "id": "Q:where did he intern",
+  "name": "assistant answer contains 'Labmentix'",
+  "result": "PASS",
+  "note": "Full Stack Web Development Intern \u2014 Labmentix Pvt. Ltd. (Remote) \u00b7 Jul 2025 \u2013 Jan 2026; MERN Stack Development Intern \u2014 Sensation Software Solutions Pvt. Ltd. \u00b7 Jul \u2013 Aug"
+ },
+ {
+  "id": "Q:does he know docker",
+  "name": "assistant answer contains 'Yes'",
+  "result": "PASS",
+  "note": "Yes \u2014 docker appears in the Skills section (Tools & Deployment)."
+ },
+ {
+  "id": "Q:what is the research paper about",
+  "name": "assistant answer contains 'Brain Stroke'",
+  "result": "PASS",
+  "note": "Published research paper (PDF) \u2014 Read the publication. (https://csjournals.com/IJCSC/PDF%2017-2/37.%20Ravi.pdf); Brain Stroke Risk Prediction (dissertation) \u2014 Comparative"
+ },
+ {
+  "id": "Q:who is ravi",
+  "name": "assistant answer contains 'MCA graduate'",
+  "result": "PASS",
+  "note": "MCA graduate specializing in Artificial Intelligence and Machine Learning, with project experience across full-stack web development, data analytics and machine-learning "
+ }
+]
