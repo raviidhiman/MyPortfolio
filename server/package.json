@@ -1,1 +1,19 @@
-{"name":"portfolio-server","version":"0.1.0","private":true,"type":"commonjs","scripts":{"start":"node index.js","test":"node --test test/api.test.js"},"dependencies":{"cookie-parser":"^1.4.7","express":"^4.21.2","pg":"^8.13.1"}}
+{
+  "name": "portfolio-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node --test --test-concurrency=1 test/api.test.js test/rag_security.test.js"
+  },
+  "dependencies": {
+    "compression": "^1.8.2",
+    "cookie-parser": "^1.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  },
+  "engines": {
+    "node": "22.x"
+  }
+}

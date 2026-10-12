@@ -1,0 +1,30 @@
+# Render Blueprint: New + > Blueprint, pick this repo. Secrets (sync: false) are typed into the Render dashboard, never committed.
+services:
+  - type: web
+    name: ravi-portfolio
+    runtime: node
+    plan: free
+    buildCommand: cd server && npm ci
+    startCommand: cd server && node index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL        # Supabase "Session pooler" string or Render Postgres; special characters in the password must be %-encoded
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: OTP_SECRET
+        generateValue: true
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_SENDER_EMAIL
+        sync: false
+      - key: LLM_BASE_URL
+        value: https://api.xkiro.com/v1
+      - key: LLM_MODEL
+        value: mistralai/mistral-large-4-0
+      - key: LLM_REASONING_EFFORT
+        value: none
+      - key: LLM_API_KEY
+        sync: false

@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
 <title>Admin — Ravi Dhiman</title>
+<link rel="icon" href="/assets/icons/favicon.ico?v=1" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=1">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=1">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=1">
+<link rel="manifest" href="/assets/icons/site.webmanifest?v=1">
 <style>
 :root{--bg:#05060f;--s:#0d1024;--s2:#141836;--t:#e8ecff;--m:#8d96c4;--cy:#00e5ff;--vi:#8b5cf6;--bd:#242a55;--bad:#ff5d7a;--ok:#34d399;color-scheme:dark}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -35,7 +40,7 @@ const sel=(opts,val,id)=>h('select',{id},opts.map(o=>{const[v,l]=Array.isArray(o
 const field=(label,el)=>{const id='f'+Math.random().toString(36).slice(2,8);el.id=id;return h('div',null,h('label',{for:id},label),el)};
 
 /* ---------- login ---------- */
-function login(msg){let email=h('input',{type:'email',autocomplete:'username',value:'ravidhiman8673@gmail.com'}),box=h('div'),step=1;
+function login(msg){let email=h('input',{type:'email',autocomplete:'off',autocapitalize:'off',spellcheck:'false',placeholder:'Type your admin e-mail',name:'f'+Math.random().toString(36).slice(2),value:''}),box=h('div'),step=1;
  const code=h('input',{inputmode:'numeric',maxlength:'6',autocomplete:'one-time-code',placeholder:'6-digit code'}),f2=h('div',{hidden:true},field('Code from your email',code));
  const go=h('button',{class:'btn pri',type:'button'},'Send code');
  go.onclick=async()=>{try{if(step===1){await fetch('/api/admin/auth/request-otp',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:email.value})}).then(r=>{if(!r.ok)throw new Error('Could not request a code')});
@@ -49,7 +54,7 @@ async function start(){try{const me=await api('GET','/auth/me');CSRF=me.csrf}cat
 async function load(){DATA=await api('GET','/sections');if(!curSec||!DATA.find(s=>s.id===curSec))curSec=DATA[0]&&DATA[0].id}
 async function render(){const main=h('main',{id:'main'}),tabs=[['content','Content'],['sections','Sections'],['site','Site & hero'],['log','Activity']];
  $app.replaceChildren(h('header',null,h('b',null,'ADMIN'),tabs.map(([k,l])=>h('button',{class:'tab','aria-selected':tab===k,onclick:()=>{tab=k;render()}},l)),h('a',{class:'btn',href:'/',target:'_blank',rel:'noopener'},'View site'),
-  h('button',{class:'btn',onclick:async()=>{try{await api('POST','/auth/logout',{})}catch(_){}CSRF='';login()}},'Sign out')),main);
+  h('button',{class:'btn',onclick:async()=>{try{await api('POST','/auth/logout',{})}catch(_){}CSRF='';location.replace(location.pathname)}},'Sign out')),main);
  try{await load();({content:viewContent,sections:viewSections,site:viewSite,log:viewLog})[tab](main)}catch(e){note(main,e.message)}}
 const confirmDel=m=>confirm(m);
 const refresh=()=>render();

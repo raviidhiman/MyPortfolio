@@ -1,3 +1,4 @@
+process.env.ADMIN_EMAIL = 'owner@example.test'; process.env.OTP_SECRET = 'test-secret';
 const { test, before, after } = require('node:test'); const assert = require('node:assert');
 const { Pool } = require('pg'); const { createApp, migrate, seed } = require('../index.js');
 const URL_ = process.env.TEST_DATABASE_URL || 'postgres://app:apppw@127.0.0.1:5432/portfolio_test';
@@ -15,7 +16,7 @@ before(async () => {
 });
 after(async () => { srv.close(); await pool.end(); });
 
-test('migrations apply from empty DB and are idempotent', async () => { await migrate(pool); assert.equal((await pool.query('select count(*)::int c from schema_migrations')).rows[0].c, 2); });
+test('migrations apply from empty DB and are idempotent', async () => { await migrate(pool); assert.equal((await pool.query('select count(*)::int c from schema_migrations')).rows[0].c, 4); });
 test('public content: 7 seeded sections, no private fields', async () => {
   const { s, j } = await call('GET', '/api/public/content', null, { cookie: false });
   assert.equal(s, 200); assert.equal(j.sections.length, 7); assert.equal(j.settings.hero.name, 'Ravi Dhiman');
@@ -30,21 +31,21 @@ test('OTP: other email gets generic reply and no code', async () => {
   assert.equal(r.s, 200); assert.equal(lastCode, null);
 });
 test('OTP: wrong code fails, attempts are limited, right code then fails after lockout', async () => {
-  await call('POST', '/api/admin/auth/request-otp', { email: 'ravidhiman8673@gmail.com' }, { cookie: false, csrf: false });
+  await call('POST', '/api/admin/auth/request-otp', { email: 'owner@example.test' }, { cookie: false, csrf: false });
   const good = lastCode, wrong = good === '000000' ? '111111' : '000000';
-  for (let i = 0; i < 5; i++) assert.equal((await call('POST', '/api/admin/auth/verify-otp', { email: 'ravidhiman8673@gmail.com', code: wrong }, { cookie: false, csrf: false })).s, 401);
-  assert.equal((await call('POST', '/api/admin/auth/verify-otp', { email: 'ravidhiman8673@gmail.com', code: good }, { cookie: false, csrf: false })).s, 401, 'locked after 5 attempts');
+  for (let i = 0; i < 5; i++) assert.equal((await call('POST', '/api/admin/auth/verify-otp', { email: 'owner@example.test', code: wrong }, { cookie: false, csrf: false })).s, 401);
+  assert.equal((await call('POST', '/api/admin/auth/verify-otp', { email: 'owner@example.test', code: good }, { cookie: false, csrf: false })).s, 401, 'locked after 5 attempts');
 });
 test('OTP: resend cooldown, then valid login, one-time use', async () => {
   await pool.query("update otp_challenges set created_at=now()-interval '5 minutes'");
-  lastCode = null; await call('POST', '/api/admin/auth/request-otp', { email: 'RaviDhiman8673@gmail.com' }, { cookie: false, csrf: false });
+  lastCode = null; await call('POST', '/api/admin/auth/request-otp', { email: 'Owner@Example.Test' }, { cookie: false, csrf: false });
   const code = lastCode; assert.match(code, /^\d{6}$/);
-  const first = lastCode; await call('POST', '/api/admin/auth/request-otp', { email: 'ravidhiman8673@gmail.com' }, { cookie: false, csrf: false });
+  const first = lastCode; await call('POST', '/api/admin/auth/request-otp', { email: 'owner@example.test' }, { cookie: false, csrf: false });
   assert.equal(lastCode, first, 'cooldown blocks a second code');
-  const v = await call('POST', '/api/admin/auth/verify-otp', { email: 'ravidhiman8673@gmail.com', code }, { cookie: false, csrf: false });
+  const v = await call('POST', '/api/admin/auth/verify-otp', { email: 'owner@example.test', code }, { cookie: false, csrf: false });
   assert.equal(v.s, 200); const sc = v.r.headers.get('set-cookie'); assert.match(sc, /HttpOnly/i); assert.match(sc, /SameSite=Strict/i);
   cookie = sc.split(';')[0]; csrf = v.j.csrf;
-  assert.equal((await call('POST', '/api/admin/auth/verify-otp', { email: 'ravidhiman8673@gmail.com', code }, { cookie: false, csrf: false })).s, 401, 'code reuse fails');
+  assert.equal((await call('POST', '/api/admin/auth/verify-otp', { email: 'owner@example.test', code }, { cookie: false, csrf: false })).s, 401, 'code reuse fails');
   const h = await pool.query('select code_hash from otp_challenges order by id desc limit 1'); assert.ok(!h.rows[0].code_hash.includes(code));
 });
 test('CSRF: mutation without or with wrong token is rejected; bad origin rejected', async () => {
@@ -59,7 +60,7 @@ test('admin can add a section and an item; drafts stay private until published',
   const i = await call('POST', '/api/admin/items', { section_id: sec.id, title: 'Test award', body: 'Body <b>x</b>', url: 'https://example.com/a' }); assert.equal(i.s, 201); item = i.j;
   let pub = (await call('GET', '/api/public/content', null, { cookie: false })).j; assert.ok(!pub.sections.find(s => s.slug.startsWith('awards')), 'draft section hidden');
   assert.equal((await call('PATCH', '/api/admin/sections/' + sec.id, { published: true })).s, 200);
-  pub = (await call('GET', '/api/public/content', null, { cookie: false })).j; const s = pub.sections.find(x => x.id === sec.id);
+  pub = (await call('GET', '/api/public/content', null, { cookie: false })).j; const s = pub.sections.find(x => x.slug === sec.slug);
   assert.ok(s && s.items[0].title === 'Test award'); assert.equal(pub.sections.length, 8);
 });
 test('admin can update, reorder, hide an item, and delete (cascade)', async () => {
@@ -68,7 +69,7 @@ test('admin can update, reorder, hide an item, and delete (cascade)', async () =
   await call('POST', '/api/admin/items/reorder', { section_id: sec.id, ids: [second.id, item.id] });
   let list = (await call('GET', '/api/admin/sections')).j.find(s => s.id === sec.id).items; assert.deepEqual(list.map(x => x.id), [second.id, item.id]);
   await call('PATCH', '/api/admin/items/' + item.id, { published: false });
-  assert.equal((await call('GET', '/api/public/content', null, { cookie: false })).j.sections.find(s => s.id === sec.id).items.length, 1);
+  assert.equal((await call('GET', '/api/public/content', null, { cookie: false })).j.sections.find(s => s.slug === sec.slug).items.length, 1);
   assert.equal((await call('DELETE', '/api/admin/sections/' + sec.id)).s, 200);
   assert.equal((await pool.query('select count(*)::int c from items where section_id=$1', [sec.id])).rows[0].c, 0);
   assert.equal((await call('DELETE', '/api/admin/sections/' + sec.id)).s, 404);

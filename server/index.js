@@ -1,15 +1,21 @@
 'use strict';
-const express = require('express'), cookieParser = require('cookie-parser'), crypto = require('crypto');
+const express = require('express'), cookieParser = require('cookie-parser'), crypto = require('crypto'), compression = require('compression'), rag = require('./rag');
 const fs = require('fs'), path = require('path'), { Pool } = require('pg');
 
 const ENV = process.env, PROD = ENV.NODE_ENV === 'production';
-const ADMIN_EMAIL = (ENV.ADMIN_EMAIL || 'ravidhiman8673@gmail.com').toLowerCase();
+/* tiny .env loader (no dependency): real environment variables win over the file */
+for (const f of [path.join(__dirname, '..', '.env'), path.join(__dirname, '.env')]) {
+  try { for (const l of fs.readFileSync(f, 'utf8').split(/\r?\n/)) { const m = l.match(/^\s*([A-Z][A-Z0-9_]*)\s*=\s*(.*?)\s*$/); if (m && ENV[m[1]] === undefined) ENV[m[1]] = m[2].replace(/^(['"])(.*)\1$/, '$2'); } } catch (e) { /* no file: fine */ }
+}
+const ADMIN_EMAIL = (ENV.ADMIN_EMAIL || '').trim().toLowerCase();   /* never hard-coded: set ADMIN_EMAIL in the environment */
+if (PROD && !ADMIN_EMAIL) throw new Error('ADMIN_EMAIL is required in production');
 const SECRET = ENV.OTP_SECRET || (PROD ? '' : 'dev-only-secret');
 if (!SECRET) throw new Error('OTP_SECRET is required in production');
 const ROOT = path.join(__dirname, '..');
 const sha = s => crypto.createHash('sha256').update(s).digest('hex');
 const hmac = s => crypto.createHmac('sha256', SECRET).update(s).digest('hex');
-const eq = (a, b) => a.length === b.length && crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
+const eq = (a, b) => typeof a === 'string' && typeof b === 'string' && a.length === b.length && crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
+const SID = PROD ? '__Host-sid' : 'sid', csrfFor = t => hmac('csrf:' + t), emailH = e => hmac('email:' + e);
 
 /* ---------- validation ---------- */
 const LAYOUTS = ['list', 'skills', 'projects', 'experience', 'education', 'contact'];
@@ -64,13 +70,14 @@ const RESERVED = new Set(['home', 'top', 'main', 'secs', 'dots', 'toast', 'tour'
 try { for (const m of fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8').matchAll(/\sid="([A-Za-z][\w-]*)"/g)) RESERVED.add(m[1].toLowerCase()); } catch (e) { /* fixed list above still applies */ }
 
 /* ---------- app factory ---------- */
-function createApp({ pool, mail }) {
+function createApp({ pool, mail, llm = rag.makeLlm() }) {
   const app = express(), q = (t, p) => pool.query(t, p);
   app.disable('x-powered-by'); app.set('trust proxy', 1);
-  app.use(express.json({ limit: '100kb' })); app.use(cookieParser());
+  app.use(compression());
+  app.use(express.json({ limit: '20kb' })); app.use(cookieParser());
   app.use((req, res, next) => {
-    res.set({ 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'strict-origin-when-cross-origin', 'X-Frame-Options': 'DENY',
-      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" });
+    res.set({ 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'strict-origin-when-cross-origin', 'X-Frame-Options': 'DENY', 'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()', 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'same-origin', ...(PROD ? { 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains' } : {}),
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' blob: data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" });
     next();
   });
   const wrap = f => (req, res, next) => Promise.resolve(f(req, res, next)).catch(next);
@@ -90,53 +97,83 @@ function createApp({ pool, mail }) {
     const st = await q('select key,value from settings'), settings = Object.fromEntries(st.rows.map(r => [r.key, r.value]));
     const secs = await q('select id,slug,title,street,color,icon,layout from sections where published order by position,id');
     const its = await q('select i.section_id,i.title,i.body,i.details,i.icon,i.url,i.live_url,i.repo_url,i.doc_url from items i join sections s on s.id=i.section_id where i.published and s.published order by i.position,i.id');
-    const sections = secs.rows.map(s => ({ ...s, items: its.rows.filter(i => i.section_id === s.id).map(({ section_id, ...i }) => i) }));
-    res.set('Cache-Control', 'public, max-age=30').json({ settings, sections });
+    const sections = secs.rows.map(({ id, ...s }) => ({ ...s, items: its.rows.filter(i => i.section_id === id).map(({ section_id, ...i }) => i) }));
+    res.set('Cache-Control', 'public, max-age=30, stale-while-revalidate=300').json({ settings, sections });
   }));
 
-  /* ----- admin auth ----- */
-  app.post('/api/admin/auth/request-otp', limit('otp-ip', 10, 3600e3), wrap(async (req, res) => {
+  /* ----- admin auth: hashed e-mail, hashed OTP, hashed session token, one session at a time ----- */
+  const adminH = ADMIN_EMAIL ? emailH(ADMIN_EMAIL) : '';
+  const mask = e => e ? e.replace(/^(.).*@(.).*(\.[^.]+)$/, '$1***@$2***$3') : '(not set)';
+  const isOwner = email => !!adminH && eq(emailH(email), adminH);
+  const noStore = (req, res, next) => { res.set('Cache-Control', 'no-store'); next(); };
+  app.use('/api/admin', noStore);
+  app.post('/api/admin/auth/request-otp', limit('otp-ip', 10, 3600e3), limit('otp-all', 8, 3600e3, () => 'all'), wrap(async (req, res) => {
     const email = str(req.body.email, 200, 'email').toLowerCase(), generic = { ok: true, message: 'If this address is allowed, a code has been sent.' };
-    if (email !== ADMIN_EMAIL) return res.json(generic);
-    const last = await q('select created_at from otp_challenges where email=$1 order by id desc limit 1', [email]);
-    if (last.rows[0] && Date.now() - last.rows[0].created_at < 60e3) return res.json(generic);
+    if (!isOwner(email)) {   /* the browser always gets the same answer; the reason is only written to YOUR terminal */
+      console.warn(PROD ? '[auth] login code request rejected' : (ADMIN_EMAIL ? `[auth hint] No code sent: the typed address does not match ADMIN_EMAIL (${mask(ADMIN_EMAIL)}). Check spelling, or fix ADMIN_EMAIL in .env and restart.` : '[auth hint] No code sent: ADMIN_EMAIL is not set. Put ADMIN_EMAIL=you@example.com in .env (project root) and restart.'));
+      return res.json(generic);
+    }
+    const eh = emailH(email), last = await q('select created_at from otp_challenges where email_h=$1 order by id desc limit 1', [eh]);
+    if (last.rows[0] && Date.now() - last.rows[0].created_at < 60e3) { if (!PROD) console.warn('[auth hint] No new code sent: a code was already sent less than 60 s ago. Use that one or wait a minute.'); return res.json(generic); }
     const code = String(crypto.randomInt(0, 1e6)).padStart(6, '0');
-    await q("insert into otp_challenges(email,code_hash,expires_at) values($1,$2,now()+interval '10 minutes')", [email, hmac(email + ':' + code)]);
-    try { await mail.sendOtp(email, code); } catch (e) { console.error('OTP email failed:', e.message); }
+    await q("delete from otp_challenges where expires_at < now() - interval '1 day'");
+    await q("insert into otp_challenges(email_h,code_hash,expires_at) values($1,$2,now()+interval '10 minutes')", [eh, hmac('otp:' + eh + ':' + code)]);
+    try { await mail.sendOtp(ADMIN_EMAIL, code); if (ENV.BREVO_API_KEY) console.log(`[auth] login code emailed via Brevo to ${mask(ADMIN_EMAIL)} (it is NOT printed here when Brevo is configured)`); } catch (e) { console.error('OTP email failed:', e.message, ENV.BREVO_API_KEY ? '- check BREVO_API_KEY and that BREVO_SENDER_EMAIL is a verified sender in Brevo' : ''); }
     res.json(generic);
   }));
   app.post('/api/admin/auth/verify-otp', limit('verify-ip', 20, 3600e3), wrap(async (req, res) => {
     const email = str(req.body.email, 200, 'email').toLowerCase(), code = str(req.body.code, 6, 'code'), fail = () => res.status(401).json({ error: 'Invalid or expired code.' });
-    if (email !== ADMIN_EMAIL || !/^\d{6}$/.test(code)) return fail();
-    const r = await q('select * from otp_challenges where email=$1 and consumed_at is null and expires_at>now() order by id desc limit 1', [email]), c = r.rows[0];
+    if (!isOwner(email) || !/^\d{6}$/.test(code)) return fail();
+    const eh = emailH(email), r = await q('select * from otp_challenges where email_h=$1 and consumed_at is null and expires_at>now() order by id desc limit 1', [eh]), c = r.rows[0];
     if (!c || c.attempts >= 5) return fail();
     await q('update otp_challenges set attempts=attempts+1 where id=$1', [c.id]);
-    if (!eq(c.code_hash, hmac(email + ':' + code))) return fail();
+    if (!eq(c.code_hash, hmac('otp:' + eh + ':' + code))) return fail();
     await q('update otp_challenges set consumed_at=now() where id=$1', [c.id]);
-    const token = crypto.randomBytes(32).toString('hex'), csrf = crypto.randomBytes(24).toString('hex');
-    await q("insert into admin_sessions(token_hash,csrf,expires_at) values($1,$2,now()+interval '8 hours')", [sha(token), csrf]);
-    res.cookie('sid', token, { httpOnly: true, sameSite: 'strict', secure: PROD, maxAge: 8 * 3600e3, path: '/' });
-    await audit('login'); res.json({ ok: true, csrf });
+    await q('update admin_sessions set revoked=true where not revoked');                       /* every login starts a brand-new session */
+    const token = crypto.randomBytes(32).toString('hex');
+    await q("insert into admin_sessions(token_hash,csrf,expires_at) values($1,'',now()+interval '2 hours')", [sha(token)]);
+    res.cookie(SID, token, { httpOnly: true, sameSite: 'strict', secure: PROD, path: '/' });   /* session cookie: gone when the browser closes */
+    await audit('login'); res.json({ ok: true, csrf: csrfFor(token) });
   }));
 
   const auth = wrap(async (req, res, next) => {
-    const t = req.cookies.sid; if (!t) return res.status(401).json({ error: 'Not signed in' });
-    const r = await q('select * from admin_sessions where token_hash=$1 and not revoked and expires_at>now()', [sha(t)]), s = r.rows[0];
+    res.set('Cache-Control', 'no-store');
+    const t = req.cookies[SID]; if (!t || typeof t !== 'string') return res.status(401).json({ error: 'Not signed in' });
+    const r = await q("select * from admin_sessions where token_hash=$1 and not revoked and expires_at>now() and last_seen>now()-interval '20 minutes'", [sha(t)]), s = r.rows[0];
     if (!s) return res.status(401).json({ error: 'Not signed in' });
     if (!['GET', 'HEAD'].includes(req.method)) {
       const o = req.get('origin'); if (o && new URL(o).host !== req.get('host')) return res.status(403).json({ error: 'Bad origin' });
-      const h = req.get('x-csrf-token') || ''; if (!h || !eq(h, s.csrf)) return res.status(403).json({ error: 'Missing or invalid CSRF token' });
+      const h = req.get('x-csrf-token') || ''; if (!h || !eq(h, csrfFor(t))) return res.status(403).json({ error: 'Missing or invalid CSRF token' });
     }
-    req.session = s; next();
+    await q('update admin_sessions set last_seen=now() where token_hash=$1', [s.token_hash]);
+    req.session = s; req.sid = t; next();
   });
-  app.get('/api/admin/auth/me', auth, (req, res) => res.json({ email: ADMIN_EMAIL, csrf: req.session.csrf }));
+  app.get('/api/admin/auth/me', auth, (req, res) => res.json({ ok: true, csrf: csrfFor(req.sid) }));
   app.post('/api/admin/auth/logout', auth, wrap(async (req, res) => {
-    await q('update admin_sessions set revoked=true where token_hash=$1', [req.session.token_hash]);
-    res.clearCookie('sid', { path: '/' }); await audit('logout'); res.json({ ok: true });
+    await q('update admin_sessions set revoked=true where not revoked');                       /* revoke every session, not just this one */
+    res.clearCookie(SID, { path: '/', httpOnly: true, sameSite: 'strict', secure: PROD });
+    if (PROD) res.set('Clear-Site-Data', '"cache", "storage"');
+    await audit('logout'); res.json({ ok: true });
+  }));
+
+  /* ----- public AI search / assistant (profile-only RAG) ----- */
+  const contactLine = async () => { const r = await q("select value from settings where key='socials'"); const s = (r.rows[0] && r.rows[0].value) || []; const m = s.find(x => /^mailto:/i.test(x.url)); return m ? m.url.replace(/^mailto:/i, '') : ''; };
+  app.post('/api/assistant/query', limit('ai-ip', 12, 600e3), limit('ai-all', 1500, 86400e3, () => 'all'), wrap(async (req, res) => {
+    if (typeof req.body.q !== 'string') throw bad('question must be text');
+    res.set('Cache-Control', 'no-store').json(await rag.ask({ pool, llm, q: req.body.q, contact: await contactLine(), daily: Number(ENV.LLM_DAILY_LIMIT) || 300 }));
+  }));
+  app.get('/api/search', limit('search-ip', 60, 60e3), wrap(async (req, res) => {
+    const text = typeof req.query.q === 'string' ? req.query.q.slice(0, 200) : '';
+    const rows = await rag.retrieve(pool, text, 8);
+    res.set('Cache-Control', 'no-store').json({ results: rows.map(r => ({ title: r.title, section: r.section_slug, snippet: rag.snippet(r.content.replace(/^[^:]*:\s*/, ''), 160), url: r.url })) });
   }));
 
   /* ----- admin content ----- */
   const A = express.Router(); A.use(auth); app.use('/api/admin', A);
+  let rt; const scheduleReindex = () => { clearTimeout(rt); rt = setTimeout(() => rag.reindex(pool).catch(e => console.error('reindex failed:', e.message)), 1500); if (rt.unref) rt.unref(); };
+  A.use((req, res, next) => { if (!['GET', 'HEAD'].includes(req.method)) res.on('finish', () => { if (res.statusCode < 300) scheduleReindex(); }); next(); });
+  A.post('/rag/reindex', wrap(async (req, res) => { const n = await rag.reindex(pool); await audit('rag-reindex', n + ' chunks'); res.json({ ok: true, chunks: n }); }));
+  A.get('/rag/status', wrap(async (req, res) => { const c = await q('select count(*)::int n from rag_chunks'), u = await q('select calls from rag_usage where day=current_date'); res.json({ chunks: c.rows[0].n, llmConfigured: !!llm, callsToday: u.rows[0] ? u.rows[0].calls : 0 }); }));
   const id = req => { const n = Number(req.params.id); if (!Number.isInteger(n) || n < 1) throw bad('bad id'); return n; };
   const setSql = (o, start = 1) => { const k = Object.keys(o); return { sql: k.map((c, i) => `${c}=$${i + start}`).join(','), vals: k.map(c => o[c]) }; };
   const notFound = () => Object.assign(new Error('Not found'), { status: 404 });
@@ -201,7 +238,9 @@ function createApp({ pool, mail }) {
   /* ----- static site ----- */
   app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
   app.use('/admin', express.static(path.join(ROOT, 'admin')));
-  app.get('/', (req, res) => res.sendFile(path.join(ROOT, 'index.html')));
+  app.get('/favicon.ico', (req, res) => res.set('Cache-Control', 'public, max-age=86400').sendFile(path.join(ROOT, 'assets', 'icons', 'favicon.ico')));
+  app.use('/assets', express.static(path.join(ROOT, 'assets'), { maxAge: '30d', immutable: true }));
+  app.get('/', (req, res) => { res.set('Cache-Control', 'no-cache'); res.sendFile(path.join(ROOT, 'index.html')); });
   app.use((err, req, res, next) => {
     if (err.type === 'entity.parse.failed') return res.status(400).json({ error: 'Invalid JSON' });
     if (err.status && err.status < 500) return res.status(err.status).json({ error: err.message });
@@ -240,12 +279,16 @@ function makeMailer() {
     if (!r.ok) throw new Error('Brevo responded ' + r.status);
   } };
 }
-module.exports = { createApp, migrate, seed, makeMailer };
+module.exports = { createApp, migrate, seed, makeMailer, rag };
 
 if (require.main === module) {
   const pool = new Pool({ connectionString: ENV.DATABASE_URL });
-  migrate(pool).then(() => seed(pool)).then(() => {
+  migrate(pool).then(() => seed(pool)).then(() => rag.reindex(pool)).then(() => {
     const port = Number(ENV.PORT) || 3000;
-    createApp({ pool, mail: makeMailer() }).listen(port, () => console.log('Portfolio server on :' + port));
+    createApp({ pool, mail: makeMailer() }).listen(port, () => {
+      const m = ADMIN_EMAIL ? ADMIN_EMAIL.replace(/^(.).*@(.).*(\.[^.]+)$/, '$1***@$2***$3') : 'NOT SET - admin login disabled';
+      console.log('Portfolio server on :' + port);
+      console.log(`  admin e-mail : ${m}\n  login codes  : ${ENV.BREVO_API_KEY ? 'emailed via Brevo' : (PROD ? 'Brevo NOT configured (login will fail)' : 'printed in this terminal (dev mode)')}\n  AI assistant : ${ENV.LLM_BASE_URL && ENV.LLM_API_KEY && ENV.LLM_MODEL ? 'model configured' : 'search-only (no LLM_ settings)'}`);
+    });
   }).catch(e => { console.error('Startup failed:', e.message); process.exit(1); });
 }

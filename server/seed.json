@@ -1,38 +1,281 @@
-{"settings":{
- "site":{"title":"Ravi Dhiman — Portfolio","description":"Ravi Dhiman — Full-stack developer, data analyst and AI/ML enthusiast. Explore the portfolio or take the wheel in Drive Mode."},
- "hero":{"tag":"Hello, I'm","name":"Ravi Dhiman","phrases":["AI & ML solutions","data dashboards","full-stack web apps"],
-  "lead":"AI/ML and full-stack developer turning data into products people enjoy using. Scroll to explore, or take the wheel.","cta":"Enter game mode to explore"},
- "socials":[{"label":"Email","icon":"mail","url":"mailto:ravidhiman8673@gmail.com"},{"label":"GitHub","icon":"github","url":"https://github.com/raviidhiman"},
-  {"label":"LinkedIn","icon":"linkedin","url":"https://www.linkedin.com/in/raviidhiman"},{"label":"Instagram","icon":"instagram","url":"https://www.instagram.com/ravii.dhiman/"}]},
-"sections":[
-{"slug":"about","title":"About","street":"About Avenue","color":"#00e5ff","icon":"user","layout":"list","items":[
- ["Who I am","MCA graduate specializing in Artificial Intelligence and Machine Learning, with project experience across full-stack web development, data analytics and machine-learning applications. Builds web applications and data workflows using JavaScript, React, Node.js, SQL, Python and related tools.","user","",""],
- ["What drives me","Developing practical, maintainable software and turning data into useful insights.","bolt","",""]]},
-{"slug":"skills","title":"Skills","street":"Skills Lane","color":"#8b5cf6","icon":"code","layout":"skills","items":[
- ["Programming & Web","Python, JavaScript, Java, C++, HTML, CSS, React, Vite, Tailwind CSS, React Router, Node.js, Express.js, Flask, MERN stack, REST APIs","code","",""],
- ["Data Analytics & ML","SQL, PostgreSQL, MySQL, Pandas, NumPy, scikit-learn, EDA, data cleaning, feature engineering, RFM segmentation, Matplotlib, Seaborn, Power BI, Excel","cpu","",""],
- ["Databases & Backend","PostgreSQL, MongoDB, Mongoose, REST APIs, JWT authentication, bcryptjs, role-based access control, OTP email verification, CRUD","db","",""],
- ["AI & LLM","Machine learning, AI/ML applications, LLM-assisted development","cpu","",""],
- ["Tools & Deployment","Git, GitHub, Postman, VS Code, Render, Vercel, Cloudinary, Brevo, Google Colab, n8n, Supabase, Streamlit, AWS EC2, Docker, Microsoft Azure","bolt","",""]]},
-{"slug":"projects","title":"Projects","street":"Projects Street","color":"#ff2bd6","icon":"folder","layout":"projects","items":[
- ["Remote Job Market Pipeline","Collects remote job listings and presents them in a Streamlit dashboard.","chart","","Python, n8n, PostgreSQL/Supabase, Groq API, scheduled automation, AWS EC2 and Docker."],
- ["Olist Brazilian E-commerce Analytics","PostgreSQL and Python analysis with a three-page Power BI dashboard.","chart","","PostgreSQL/pgAdmin, Python data analysis, Power BI dashboard, RFM customer segmentation."],
- ["ThreadSource — B2B Textile Marketplace","Marketplace for textile buyers and sellers.","globe","","React, Vite, Tailwind CSS, Node.js, Express, MongoDB Atlas, Mongoose, JWT, bcryptjs, role-based access, OTP email verification, Cloudinary, Brevo and Razorpay (test mode)."],
- ["Brain Stroke Risk Prediction","Comparative analysis of machine-learning algorithms for stroke-risk prediction.","flask","","Logistic Regression, Random Forest and SVM; preprocessing, EDA, feature engineering; evaluated with accuracy, precision, recall, F1 and ROC-AUC. Research project, not a clinical diagnostic tool."],
- ["Liverr — Freelance Marketplace","Full-stack freelance marketplace.","globe","","React 18, Vite, React Router, Tailwind, Node.js, Express, MongoDB Atlas/Mongoose, JWT, security middleware, Brevo email and Razorpay."]]},
-{"slug":"experience","title":"Experience","street":"Experience Road","color":"#3b82f6","icon":"briefcase","layout":"experience","items":[
- ["Full Stack Web Development Intern","Labmentix Pvt. Ltd. (Remote) · Jul 2025 – Jan 2026","briefcase","",""],
- ["MERN Stack Development Intern","Sensation Software Solutions Pvt. Ltd. · Jul – Aug 2025","briefcase","",""]]},
-{"slug":"education","title":"Education","street":"Education Drive","color":"#a78bfa","icon":"cap","layout":"education","items":[
- ["MCA — Artificial Intelligence & Machine Learning","Chaudhary Ranbir Singh University (CRSU), Jind · 2024–2026 · CGPA 8","cap","",""],
- ["BCA — Computer Applications","2019–2022 · 68%","cap","",""],
- ["Class XII — Non-Medical","Board of School Education Haryana · 2019 · 64.8%","user","",""],
- ["Class X — General","Board of School Education Haryana · 2017 · 71.6%","user","",""]]},
-{"slug":"research","title":"Research","street":"Research Corner","color":"#34d399","icon":"flask","layout":"list","items":[
- ["Published research paper (PDF)","Read the publication.","flask","https://csjournals.com/IJCSC/PDF%2017-2/37.%20Ravi.pdf",""],
- ["Brain Stroke Risk Prediction (dissertation)","Comparative Analysis of Machine Learning Algorithms for Brain Stroke Risk Prediction — Logistic Regression, Random Forest and SVM.","cpu","",""]]},
-{"slug":"contact","title":"Contact","street":"Contact Circle","color":"#22d3ee","icon":"mail","layout":"contact","items":[
- ["Email","ravidhiman8673@gmail.com","mail","mailto:ravidhiman8673@gmail.com",""],
- ["GitHub","github.com/raviidhiman","github","https://github.com/raviidhiman",""],
- ["LinkedIn","linkedin.com/in/raviidhiman","linkedin","https://www.linkedin.com/in/raviidhiman",""],
- ["Instagram","@ravii.dhiman","instagram","https://www.instagram.com/ravii.dhiman/",""]]}]}
+{
+  "settings": {
+    "site": {
+      "title": "Ravi Dhiman",
+      "description": "Ravi Dhiman — Full-stack developer, data analyst and AI/ML enthusiast. Explore the portfolio or take the wheel in Drive Mode."
+    },
+    "hero": {
+      "tag": "Hello, I'm",
+      "name": "Ravi Dhiman",
+      "phrases": [
+        "AI & ML solutions",
+        "data dashboards",
+        "full-stack web apps"
+      ],
+      "lead": "AI/ML and full-stack developer turning data into products people enjoy using. Scroll to explore, or take the wheel.",
+      "cta": "Enter game mode to explore"
+    },
+    "socials": [
+      {
+        "label": "Email",
+        "icon": "mail",
+        "url": "mailto:ravidhiman8673@gmail.com"
+      },
+      {
+        "label": "GitHub",
+        "icon": "github",
+        "url": "https://github.com/raviidhiman"
+      },
+      {
+        "label": "LinkedIn",
+        "icon": "linkedin",
+        "url": "https://www.linkedin.com/in/raviidhiman"
+      },
+      {
+        "label": "Instagram",
+        "icon": "instagram",
+        "url": "https://www.instagram.com/ravii.dhiman/"
+      }
+    ]
+  },
+  "sections": [
+    {
+      "slug": "about",
+      "title": "About",
+      "street": "About Avenue",
+      "color": "#00e5ff",
+      "icon": "user",
+      "layout": "list",
+      "items": [
+        [
+          "Who I am",
+          "MCA graduate specializing in Artificial Intelligence and Machine Learning, with project experience across full-stack web development, data analytics and machine-learning applications. Builds web applications and data workflows using JavaScript, React, Node.js, SQL, Python and related tools.",
+          "user",
+          "",
+          ""
+        ],
+        [
+          "What drives me",
+          "Developing practical, maintainable software and turning data into useful insights.",
+          "bolt",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "slug": "skills",
+      "title": "Skills",
+      "street": "Skills Lane",
+      "color": "#8b5cf6",
+      "icon": "code",
+      "layout": "skills",
+      "items": [
+        [
+          "Programming & Web",
+          "Python, JavaScript, Java, C++, HTML, CSS, React, Vite, Tailwind CSS, React Router, Node.js, Express.js, Flask, MERN stack, REST APIs",
+          "code",
+          "",
+          ""
+        ],
+        [
+          "Data Analytics & ML",
+          "SQL, PostgreSQL, MySQL, Pandas, NumPy, scikit-learn, EDA, data cleaning, feature engineering, RFM segmentation, Matplotlib, Seaborn, Power BI, Excel",
+          "cpu",
+          "",
+          ""
+        ],
+        [
+          "Databases & Backend",
+          "PostgreSQL, MongoDB, Mongoose, REST APIs, JWT authentication, bcryptjs, role-based access control, OTP email verification, CRUD",
+          "db",
+          "",
+          ""
+        ],
+        [
+          "AI & LLM",
+          "Machine learning, AI/ML applications, LLM-assisted development",
+          "cpu",
+          "",
+          ""
+        ],
+        [
+          "Tools & Deployment",
+          "Git, GitHub, Postman, VS Code, Render, Vercel, Cloudinary, Brevo, Google Colab, n8n, Supabase, Streamlit, AWS EC2, Docker, Microsoft Azure",
+          "bolt",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "slug": "projects",
+      "title": "Projects",
+      "street": "Projects Street",
+      "color": "#ff2bd6",
+      "icon": "folder",
+      "layout": "projects",
+      "items": [
+        [
+          "Remote Job Market Pipeline",
+          "Collects remote job listings and presents them in a Streamlit dashboard.",
+          "chart",
+          "",
+          "Python, n8n, PostgreSQL/Supabase, Groq API, scheduled automation, AWS EC2 and Docker."
+        ],
+        [
+          "Olist Brazilian E-commerce Analytics",
+          "PostgreSQL and Python analysis with a three-page Power BI dashboard.",
+          "chart",
+          "",
+          "PostgreSQL/pgAdmin, Python data analysis, Power BI dashboard, RFM customer segmentation."
+        ],
+        [
+          "ThreadSource — B2B Textile Marketplace",
+          "Marketplace for textile buyers and sellers.",
+          "globe",
+          "",
+          "React, Vite, Tailwind CSS, Node.js, Express, MongoDB Atlas, Mongoose, JWT, bcryptjs, role-based access, OTP email verification, Cloudinary, Brevo and Razorpay (test mode)."
+        ],
+        [
+          "Brain Stroke Risk Prediction",
+          "Comparative analysis of machine-learning algorithms for stroke-risk prediction.",
+          "flask",
+          "",
+          "Logistic Regression, Random Forest and SVM; preprocessing, EDA, feature engineering; evaluated with accuracy, precision, recall, F1 and ROC-AUC. Research project, not a clinical diagnostic tool."
+        ],
+        [
+          "Liverr — Freelance Marketplace",
+          "Full-stack freelance marketplace.",
+          "globe",
+          "",
+          "React 18, Vite, React Router, Tailwind, Node.js, Express, MongoDB Atlas/Mongoose, JWT, security middleware, Brevo email and Razorpay."
+        ]
+      ]
+    },
+    {
+      "slug": "experience",
+      "title": "Experience",
+      "street": "Experience Road",
+      "color": "#3b82f6",
+      "icon": "briefcase",
+      "layout": "experience",
+      "items": [
+        [
+          "Full Stack Web Development Intern",
+          "Labmentix Pvt. Ltd. (Remote) · Jul 2025 – Jan 2026",
+          "briefcase",
+          "",
+          ""
+        ],
+        [
+          "MERN Stack Development Intern",
+          "Sensation Software Solutions Pvt. Ltd. · Jul – Aug 2025",
+          "briefcase",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "slug": "education",
+      "title": "Education",
+      "street": "Education Drive",
+      "color": "#a78bfa",
+      "icon": "cap",
+      "layout": "education",
+      "items": [
+        [
+          "MCA — Artificial Intelligence & Machine Learning",
+          "Chaudhary Ranbir Singh University (CRSU), Jind · 2024–2026 · CGPA 8",
+          "cap",
+          "",
+          ""
+        ],
+        [
+          "BCA — Computer Applications",
+          "2019–2022 · 68%",
+          "cap",
+          "",
+          ""
+        ],
+        [
+          "Class XII — Non-Medical",
+          "Board of School Education Haryana · 2019 · 64.8%",
+          "user",
+          "",
+          ""
+        ],
+        [
+          "Class X — General",
+          "Board of School Education Haryana · 2017 · 71.6%",
+          "user",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "slug": "research",
+      "title": "Research",
+      "street": "Research Corner",
+      "color": "#34d399",
+      "icon": "flask",
+      "layout": "list",
+      "items": [
+        [
+          "Published research paper (PDF)",
+          "Read the publication.",
+          "flask",
+          "https://csjournals.com/IJCSC/PDF%2017-2/37.%20Ravi.pdf",
+          ""
+        ],
+        [
+          "Brain Stroke Risk Prediction (dissertation)",
+          "Comparative Analysis of Machine Learning Algorithms for Brain Stroke Risk Prediction — Logistic Regression, Random Forest and SVM.",
+          "cpu",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "slug": "contact",
+      "title": "Contact",
+      "street": "Contact Circle",
+      "color": "#22d3ee",
+      "icon": "mail",
+      "layout": "contact",
+      "items": [
+        [
+          "Email",
+          "ravidhiman8673@gmail.com",
+          "mail",
+          "mailto:ravidhiman8673@gmail.com",
+          ""
+        ],
+        [
+          "GitHub",
+          "github.com/raviidhiman",
+          "github",
+          "https://github.com/raviidhiman",
+          ""
+        ],
+        [
+          "LinkedIn",
+          "linkedin.com/in/raviidhiman",
+          "linkedin",
+          "https://www.linkedin.com/in/raviidhiman",
+          ""
+        ],
+        [
+          "Instagram",
+          "@ravii.dhiman",
+          "instagram",
+          "https://www.instagram.com/ravii.dhiman/",
+          ""
+        ]
+      ]
+    }
+  ]
+}
