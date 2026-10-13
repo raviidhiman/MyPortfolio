@@ -20,6 +20,6 @@ with sync_playwright() as pw:
     b = pw.chromium.launch(args=["--use-gl=swiftshader", "--enable-webgl", "--ignore-gpu-blocklist"]); c = b.new_context(viewport={"width": 640, "height": 360}); c.route("**/cdnjs.cloudflare.com/**", lambda r: r.fulfill(status=200, content_type="application/javascript", body=THREE))
     p = c.new_page(); p.goto(BASE + "/"); p.wait_for_timeout(800); p.click("#bDrive"); p.wait_for_timeout(4000); p.click("#cMan"); p.wait_for_timeout(300)
     p.evaluate("run=false;cancelAnimationFrame(raf)")   # freeze the live loop so only our calls step the sim
-    for i in range(3): r = p.evaluate(JS, i); res.append(r); print(json.dumps(r))
+    for i in range(1): r = p.evaluate(JS, i)   # one car (G-Class) since the sedan was removed; res.append(r); print(json.dumps(r))
     b.close()
 json.dump(res, open(os.path.join(os.path.dirname(__file__), "physics-results.json"), "w"), indent=1)

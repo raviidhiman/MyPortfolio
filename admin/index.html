@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
 <title>Admin — Ravi Dhiman</title>
+<meta name="google-site-verification" content="gKDB1_70Y07uSwvsef_PWADxzoKm-gnvc6zoq3l4dFs" />
+<link rel="icon" type="image/png" href="/assets/icons/android-chrome-192x192.png">
 <style>
 :root{--bg:#05060f;--s:#0d1024;--s2:#141836;--t:#e8ecff;--m:#8d96c4;--cy:#00e5ff;--vi:#8b5cf6;--bd:#242a55;--bad:#ff5d7a;--ok:#34d399;color-scheme:dark}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -20,7 +22,24 @@ input[type=text],input[type=email],input[type=url],input:not([type]),select,text
 textarea{min-height:90px;resize:vertical}input[type=color]{width:56px;height:38px;padding:2px;background:var(--bg);border:1px solid var(--bd);border-radius:8px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}@media(max-width:640px){.grid{grid-template-columns:1fr}}
 .msg{padding:9px 12px;border-radius:8px;margin:10px 0}.msg.err{background:#ff5d7a22;border:1px solid #ff5d7a66}.msg.ok{background:#34d39922;border:1px solid #34d39966}
-.login{max-width:380px;margin:12vh auto;padding:0 16px}.chk{display:flex;gap:8px;align-items:center;margin-top:12px}.chk input{width:auto}
+[hidden]{display:none!important}
+.chk{display:flex;gap:8px;align-items:center;margin-top:12px}.chk input{width:auto}
+
+.login{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:24px;text-align:center}
+.login h1{margin:0;font-size:clamp(30px,6vw,44px);font-weight:600;letter-spacing:.5px;line-height:1.1}
+.login h1::after{content:"";display:block;width:56px;height:2px;margin:16px auto 0;border-radius:2px;background:linear-gradient(90deg,var(--cy),var(--vi))}
+.login .big{padding:13px 34px;border-radius:999px;font-size:16px;letter-spacing:.4px;transition:background .2s,box-shadow .2s,transform .1s}
+.login .big:hover:not(:disabled){background:#00e5ff26;box-shadow:0 0 0 4px #00e5ff14}.login .big:active:not(:disabled){transform:scale(.98)}
+.login .step2{display:flex;flex-direction:column;align-items:center;gap:14px;width:min(300px,100%)}.login .step2[hidden]{display:none}
+.codein{width:100%;text-align:center;font-size:26px;letter-spacing:.5em;padding:12px 8px 12px 20px!important;border-radius:12px!important;font-variant-numeric:tabular-nums}
+.login .ghost{background:none;border:0;color:var(--m);cursor:pointer;padding:6px 10px;font-size:14px}.login .ghost:hover:not(:disabled){color:var(--cy)}.login .ghost:disabled{cursor:default;opacity:.7}
+.login .msg{margin:0;max-width:340px}button:disabled{cursor:not-allowed;opacity:.6}
+.goback{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:14px;width:42px;height:42px;display:grid;place-items:center;border:1px solid var(--bd);border-radius:50%;background:var(--s);color:var(--t);transition:border-color .2s,color .2s;z-index:6}.goback:hover{border-color:var(--cy);color:var(--cy)}
+.chatlog{height:min(360px,50vh);overflow-y:auto;padding:12px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);display:flex;flex-direction:column;gap:8px}
+.bub{max-width:82%;padding:8px 12px;border-radius:14px;background:var(--s2);border:1px solid var(--bd);white-space:pre-wrap;overflow-wrap:anywhere}.bub small{display:block;color:var(--m);font-size:11px;margin-top:3px}
+.bub.admin{align-self:flex-end;background:#00e5ff1a;border-color:#00e5ff55}.bub.visitor{align-self:flex-start}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;border:1px solid var(--bd);color:var(--m)}.pill.open{border-color:#34d39988;color:var(--ok)}.pill.closed{border-color:#ff5d7a88;color:var(--bad)}.pill.new{border-color:var(--cy);color:var(--cy)}
+.msgtext{white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0 0}.composer{display:flex;gap:8px;margin-top:10px;align-items:flex-end}.composer textarea{min-height:44px;height:44px}
 </style></head><body>
 <div id="app"></div>
 <script>
@@ -35,22 +54,32 @@ const sel=(opts,val,id)=>h('select',{id},opts.map(o=>{const[v,l]=Array.isArray(o
 const field=(label,el)=>{const id='f'+Math.random().toString(36).slice(2,8);el.id=id;return h('div',null,h('label',{for:id},label),el)};
 
 /* ---------- login ---------- */
-function login(msg){let email=h('input',{type:'email',autocomplete:'username',value:'ravidhiman8673@gmail.com'}),box=h('div'),step=1;
- const code=h('input',{inputmode:'numeric',maxlength:'6',autocomplete:'one-time-code',placeholder:'6-digit code'}),f2=h('div',{hidden:true},field('Code from your email',code));
- const go=h('button',{class:'btn pri',type:'button'},'Send code');
- go.onclick=async()=>{try{if(step===1){await fetch('/api/admin/auth/request-otp',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:email.value})}).then(r=>{if(!r.ok)throw new Error('Could not request a code')});
-   step=2;f2.hidden=false;go.textContent='Verify and sign in';note(box,'If this address is allowed, a code has been sent. Enter it below.',true);code.focus()}
-  else{const r=await fetch('/api/admin/auth/verify-otp',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({email:email.value,code:code.value})});const j=await r.json();if(!r.ok)throw new Error(j.error||'Failed');CSRF=j.csrf;start()}}catch(e){note(box,e.message)}};
- $app.replaceChildren(h('div',{class:'login'},h('h2',null,'Admin sign in'),h('p',{style:'color:var(--m)'},'Only the owner can sign in. A one-time code is sent to your email.'),msg?h('div',{class:'msg err'},msg):null,field('Email',email),f2,h('div',{style:'margin-top:14px'},go),box))}
+function login(msg){stopPoll();
+ const code=h('input',{class:'codein',inputmode:'numeric',maxlength:'6',autocomplete:'one-time-code','aria-label':'Code',placeholder:'••••••'}),
+  box=h('div',{role:'status'}),send=h('button',{class:'btn pri big',type:'button'},'Send code'),verify=h('button',{class:'btn pri big',type:'button'},'Verify'),
+  resend=h('button',{class:'ghost',type:'button',disabled:true}),step2=h('div',{class:'step2',hidden:true},code,verify,resend);
+ let tm=null;
+ const tick=n=>{clearInterval(tm);const end=Date.now()+n*1000,f=()=>{const s=Math.ceil((end-Date.now())/1000);if(s<=0){clearInterval(tm);resend.disabled=false;resend.textContent='Resend code'}else{resend.disabled=true;resend.textContent='Resend in '+s+'s'}};f();tm=setInterval(f,250)};
+ const ask=async()=>{send.disabled=true;resend.disabled=true;box.replaceChildren();
+  try{const r=await fetch('/api/admin/auth/request-otp',{method:'POST',headers:{'content-type':'application/json'},body:'{}'});if(!r.ok)throw new Error(r.status===429?'Too many requests. Try again later.':'Could not send the code');
+   send.hidden=true;step2.hidden=false;code.value='';tick(30);code.focus()}
+  catch(e){send.disabled=false;if(!step2.hidden)tick(0);note(box,e.message)}};
+ const check=async()=>{const c=code.value.trim();if(!/^\d{6}$/.test(c))return note(box,'Enter the 6-digit code');verify.disabled=true;
+  try{const r=await fetch('/api/admin/auth/verify-otp',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({code:c})});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Failed');CSRF=j.csrf;clearInterval(tm);start()}
+  catch(e){note(box,e.message);verify.disabled=false;code.select()}};
+ send.onclick=ask;resend.onclick=ask;verify.onclick=check;code.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();check()}});code.addEventListener('input',()=>{code.value=code.value.replace(/\D/g,'')});
+ const back=h('a',{class:'goback',href:'/','aria-label':'Back to site',title:'Back to site'});back.innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>';
+ $app.replaceChildren(back,h('div',{class:'login'},h('h1',null,'Admin Login'),msg?h('div',{class:'msg err'},msg):null,send,step2,box))}
 
 /* ---------- shell ---------- */
-let tab='content',DATA=[],SETS=null,curSec=null;
+let tab='content',DATA=[],SETS=null,curSec=null,selMsg=null,pollT=null;
+const stopPoll=()=>{clearInterval(pollT);pollT=null};
 async function start(){try{const me=await api('GET','/auth/me');CSRF=me.csrf}catch(_){return login()}render()}
 async function load(){DATA=await api('GET','/sections');if(!curSec||!DATA.find(s=>s.id===curSec))curSec=DATA[0]&&DATA[0].id}
-async function render(){const main=h('main',{id:'main'}),tabs=[['content','Content'],['sections','Sections'],['site','Site & hero'],['log','Activity']];
+async function render(){stopPoll();const main=h('main',{id:'main'}),tabs=[['content','Content'],['sections','Sections'],['messages','Messages'],['site','Site & hero'],['log','Activity']];
  $app.replaceChildren(h('header',null,h('b',null,'ADMIN'),tabs.map(([k,l])=>h('button',{class:'tab','aria-selected':tab===k,onclick:()=>{tab=k;render()}},l)),h('a',{class:'btn',href:'/',target:'_blank',rel:'noopener'},'View site'),
-  h('button',{class:'btn',onclick:async()=>{try{await api('POST','/auth/logout',{})}catch(_){}CSRF='';login()}},'Sign out')),main);
- try{await load();({content:viewContent,sections:viewSections,site:viewSite,log:viewLog})[tab](main)}catch(e){note(main,e.message)}}
+  h('button',{class:'btn',onclick:async()=>{try{await api('POST','/auth/logout',{})}catch(_){}CSRF='';location.replace(location.pathname)}},'Sign out')),main);
+ try{await load();({content:viewContent,sections:viewSections,messages:viewMessages,site:viewSite,log:viewLog})[tab](main)}catch(e){note(main,e.message)}}
 const confirmDel=m=>confirm(m);
 const refresh=()=>render();
 
@@ -93,5 +122,38 @@ async function viewSite(m){const S=await api('GET','/settings'),box=h('div'),g=(
  m.append(h('h2',null,'Site & hero'),h('div',{class:'card'},field('Browser title',st),field('Search description',sd),h('div',{class:'grid'},field('Hero greeting',tag),field('Your name',nm),field('Button label',cta)),field('Typing phrases (one per line)',ph),field('Hero paragraph',ld)),
   h('h3',null,'Social & contact icons'),rows,h('button',{class:'btn',onclick:()=>addSoc()},'+ Add link'),h('div',{style:'margin-top:14px'},save),box)}
 async function viewLog(m){const l=await api('GET','/audit-log');m.append(h('h2',null,'Recent activity'),...l.map(e=>h('div',{class:'row'},h('b',null,e.action),h('div',{class:'g'},e.detail),h('small',null,new Date(e.created_at).toLocaleString()))))}
+/* ---------- messages + chat ---------- */
+const when=d=>new Date(d).toLocaleString([],{dateStyle:'medium',timeStyle:'short'});
+async function viewMessages(m){if(selMsg)return msgDetail(m,selMsg);
+ const list=await api('GET','/messages');
+ m.append(h('h2',null,'Messages'),list.length?null:h('p',{style:'color:var(--m)'},'No messages yet.'),
+  ...list.map(x=>h('div',{class:'row'+(x.is_read?'':' new'),style:'cursor:pointer',onclick:()=>{selMsg=x.id;render()}},
+   h('div',{class:'g'},h('b',null,x.name),' ',x.is_read?null:h('span',{class:'pill new'},'New'),' ',x.chat_id?h('span',{class:'pill '+x.chat_status},'Chat '+x.chat_status):null,x.unread?h('span',{class:'pill new'},x.unread+' unread chat'):null,
+    h('small',null,x.email+' · '+when(x.created_at)),h('small',null,x.message.length>110?x.message.slice(0,110)+'…':x.message)),
+   h('button',{class:'btn sm'},'Open'))))}
+async function msgDetail(m,id){
+ const all=await api('GET','/messages'),x=all.find(y=>y.id===id);if(!x){selMsg=null;return render()}
+ if(!x.is_read)api('POST','/messages/'+id+'/read',{}).catch(()=>{});
+ const box=h('div',{role:'status'});
+ const invite=h('button',{class:'btn pri',onclick:async()=>{if(x.chat_id&&!confirm('This sends a new link and the old chat link stops working. Continue?'))return;invite.disabled=true;
+   try{await api('POST','/messages/'+id+'/invite',{});render()}catch(e){note(box,e.message);invite.disabled=false}}},x.chat_id?'Send invite again':'Send chat invite');
+ const del=h('button',{class:'btn del',onclick:async()=>{if(!confirm('Delete this message and its chat?'))return;try{await api('DELETE','/messages/'+id);selMsg=null;render()}catch(e){note(box,e.message)}}},'Delete');
+ m.append(h('button',{class:'btn sm',onclick:()=>{selMsg=null;render()}},'← All messages'),h('h2',null,x.name),
+  h('div',{class:'card'},h('small',{style:'color:var(--m)'},x.email+' · '+when(x.created_at)),h('p',{class:'msgtext'},x.message),
+   h('div',{style:'display:flex;gap:8px;flex-wrap:wrap;margin-top:14px'},invite,h('a',{class:'btn',href:'mailto:'+x.email},'Reply by email'),del),box));
+ if(x.chat_id)chatPanel(m,x.chat_id)}
+function chatPanel(m,cid){
+ const log=h('div',{class:'chatlog','aria-live':'polite'}),inp=h('textarea',{placeholder:'Write a message',maxlength:'1000','aria-label':'Message'}),
+  sendB=h('button',{class:'btn pri'},'Send'),closeB=h('button',{class:'btn del sm'},'Close chat'),status=h('span',{class:'pill'}),comp=h('div',{class:'composer'},inp,sendB),box=h('div',{role:'status'});
+ let last=0,open=true;
+ const setSt=s=>{open=s==='open';status.className='pill '+s;status.textContent=s==='open'?'Open':'Closed';closeB.hidden=!open;comp.hidden=!open};
+ const pull=async()=>{const c=await api('GET','/chats/'+cid+'?after='+last);setSt(c.status);
+  if(c.posts.length){const near=log.scrollHeight-log.scrollTop-log.clientHeight<80||!last;c.posts.forEach(p=>{log.append(h('div',{class:'bub '+p.sender},p.body,h('small',null,(p.sender==='admin'?'You':'Visitor')+' · '+when(p.created_at))));last=Math.max(last,p.id)});if(near)log.scrollTop=log.scrollHeight}};
+ const post=async()=>{const b=inp.value.trim();if(!b)return;sendB.disabled=true;try{await api('POST','/chats/'+cid+'/post',{body:b});inp.value='';await pull()}catch(e){note(box,e.message)}sendB.disabled=false;inp.focus()};
+ sendB.onclick=post;inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();post()}});
+ closeB.onclick=async()=>{if(!confirm('Close this chat? The visitor will no longer be able to send messages.'))return;try{await api('POST','/chats/'+cid+'/close',{});await pull()}catch(e){note(box,e.message)}};
+ m.append(h('div',{class:'card'},h('div',{style:'display:flex;gap:10px;align-items:center;margin-bottom:10px'},h('b',{style:'margin-right:auto'},'Chat'),status,closeB),log,comp,box));
+ pull().catch(e=>note(box,e.message));pollT=setInterval(()=>pull().catch(()=>{}),4000)}
+
 start();
 </script></body></html>

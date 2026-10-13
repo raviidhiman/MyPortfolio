@@ -18,6 +18,8 @@ THREE = open(os.path.join(ROOT, "tests", "vendor", "three-r128.min.js"), "rb").r
 AXE = open(os.path.join(ROOT, "tests", "vendor", "axe.min.js"), encoding="utf8").read()
 PAGE = sys.argv[1] if len(sys.argv) > 1 else "index.html"
 PORT = int(os.environ.get("BASELINE_PORT", "8765"))
+EXTERNAL = bool(os.environ.get("BASELINE_EXTERNAL"))   # set to test a running server (e.g. BASELINE_PORT=3100 BASELINE_EXTERNAL=1) instead of the built-in static server
+if EXTERNAL: PAGE = ""
 SECTIONS = ["about", "skills", "projects", "experience", "education", "research", "contact"]
 
 SEED = """(()=>{let a=123456789;Math.random=function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);
@@ -75,7 +77,7 @@ def open_page(ctx, errs=None, dialogs=None):
 def ev(p, js): return p.evaluate(js)
 
 def main():
-    srv = serve()
+    srv = None if EXTERNAL else serve()
     with sync_playwright() as pw:
         b = pw.chromium.launch(args=["--use-gl=swiftshader", "--enable-webgl", "--ignore-gpu-blocklist", "--autoplay-policy=no-user-gesture-required"])
 
@@ -98,10 +100,12 @@ def main():
             c1 = not ev(p, "document.getElementById('drawer').classList.contains('on')")
             p.click("#bHam"); p.wait_for_timeout(200); p.mouse.click(300, 400); p.wait_for_timeout(200)
             c2 = not ev(p, "document.getElementById('drawer').classList.contains('on')")
-            p.click("#bHam"); p.wait_for_timeout(200); p.click("#dlinks [data-go=skills]"); p.wait_for_timeout(1500)
-            c3 = not ev(p, "document.getElementById('drawer').classList.contains('on')") and abs(ev(p, "document.getElementById('skills').getBoundingClientRect().top"))<120
+            # CHANGED (pages update): a burger-menu link now opens that section's own page (/skills) instead of scrolling the landing page
+            p.click("#bHam"); p.wait_for_timeout(200)
+            with p.expect_navigation(): p.click("#dlinks [data-page='/skills']")
+            c3 = p.url.endswith("/skills"); p.goto(f"http://127.0.0.1:{PORT}/{PAGE}", wait_until="load"); p.wait_for_timeout(500)
             return (o and c1 and c2 and c3, f"open={o} esc={c1} outside={c2} link={c3}")
-        check("N3", "drawer opens; closes by Esc, outside click and link navigation", drawer)
+        check("N3", "drawer opens; closes by Esc and outside click; a section link opens that section's page", drawer)
         def acc():
             p.evaluate("document.getElementById('projects').scrollIntoView()"); p.wait_for_timeout(600)
             r = "#projects .acc >> nth=0"
@@ -186,7 +190,7 @@ def main():
         # ---------- D: drive mode ----------
         ctx = new_ctx(b, 1280, 720); route_three(ctx); errs = []; p = open_page(ctx, errs)
         def start():
-            p.click("#bDrive"); p.wait_for_function("window.THREE && document.getElementById('drive').classList.contains('on')", timeout=20000); p.wait_for_timeout(1200)
+            p.click("#bDrive"); p.wait_for_function("window.THREE && document.getElementById('drive').classList.contains('on')", timeout=20000); p.wait_for_function("document.getElementById('choose').classList.contains('on')", timeout=60000); p.wait_for_timeout(300)
             ch = ev(p, "document.getElementById('choose').classList.contains('on')"); ov = ev(p, "document.body.style.overflow")
             return (ch and ov == "hidden", f"choose_overlay={ch} body_overflow={ov}")
         check("D1", "Drive Mode starts; chooser shown; page scroll locked", start)
@@ -222,17 +226,21 @@ def main():
             return (vis and pan and closed, f"pill={vis} panel={pan} keep_driving_closes={closed} (position set via internal state: white-box)")
         check("D6", "near a sign: info pill -> detail panel -> Keep driving", sign)
         def normal_back():
-            p.click("#dinfo"); p.wait_for_timeout(200); p.click("#pn"); p.wait_for_timeout(1500)
-            off = not ev(p, "document.getElementById('drive').classList.contains('on')"); ov = ev(p, "document.body.style.overflow")
-            near = abs(ev(p, "document.getElementById('projects').getBoundingClientRect().top")) < 150
-            return (off and ov == "" and near, f"drive_off={off} scroll_unlocked={ov==''} at_projects={near}")
-        check("D7", "'Open in Normal Mode' exits Drive and scrolls to the section", normal_back)
-        p.click("#bDrive"); p.wait_for_timeout(1200); p.click("#cMan")
+            # CHANGED (pages update): the panel button opens that section's own page and saves the game position, instead of scrolling the landing page
+            p.click("#dinfo"); p.wait_for_timeout(200); label = ev(p, "$('#pn').textContent")
+            saved_expected = ev(p, "({px:+px.toFixed(3),pz:+pz.toFixed(3)})")
+            with p.expect_navigation(): p.click("#pn")
+            url_ok = p.url.endswith("/projects"); st = ev(p, "JSON.parse(sessionStorage.getItem('rd_drive')||'null')")
+            same = bool(st) and abs(st["px"]-saved_expected["px"]) < .01 and abs(st["pz"]-saved_expected["pz"]) < .01
+            p.goto(f"http://127.0.0.1:{PORT}/{PAGE}", wait_until="load"); p.wait_for_timeout(600)
+            return (label == "Open full page" and url_ok and same, f"label={label!r} url_ends_with_/projects={url_ok} position_saved={same}")
+        check("D7", "'Open full page' goes to that section's own page and saves the game position", normal_back)
+        p.click("#bDrive"); p.wait_for_function("document.getElementById('choose').classList.contains('on')", timeout=60000); p.click("#cMan")
         def car_snd():
-            t0 = ev(p, "$('#bCar').title"); p.click("#bCar"); p.wait_for_timeout(300); t1 = ev(p, "$('#bCar').title")
+            gone = ev(p, "!document.getElementById('bCar')&&CARS.length===1&&CARS[0].n==='G-Class'")
             s0 = ev(p, "$('#bSnd').innerHTML"); p.click("#bSnd"); s1 = ev(p, "$('#bSnd').innerHTML"); p.click("#bSnd")
-            return (t0 != t1 and s0 != s1, f"car '{t0}' -> '{t1}'; sound icon toggles={s0!=s1}")
-        check("D8", "car switch and sound toggle", car_snd)
+            return (gone and s0 != s1, f"sedan and car button removed={gone}; sound icon toggles={s0!=s1}")
+        check("D8", "sedan and car-change button removed; sound toggle works", car_snd)
         p.screenshot(path=f"{SHOTS}/drive-01-driving.png")
         for i, nm in enumerate(["chase-close", "chase-far", "hood", "cockpit"]):
             ev(p, f"(()=>{{while(cm!=={i})camNext()}})()"); p.wait_for_timeout(500); p.screenshot(path=f"{SHOTS}/drive-10-cam-{nm}.png")
@@ -292,7 +300,7 @@ def main():
         ctx = new_ctx(b); route_three(ctx); p = open_page(ctx)
         check("F2", "no window.claude runtime -> search still answers via retrieval", lambda: (p.fill("#sq","contact") or p.press("#sq","Enter") or p.wait_for_timeout(800) or True) and len(ev(p, "document.getElementById('at').textContent"))>5)
         ctx.close(); b.close()
-    srv.shutdown()
+    (srv.shutdown() if srv else None)
     p_, f_ = sum(r["result"]=="PASS" for r in results), sum(r["result"]=="FAIL" for r in results)
     json.dump({"page": PAGE, "pass": p_, "fail": f_, "results": results, "ran_at": time.strftime("%Y-%m-%d %H:%M:%S")}, open(f"{OUT}/results.json", "w"), indent=1)
     print(f"\nTOTAL pass={p_} fail={f_}")

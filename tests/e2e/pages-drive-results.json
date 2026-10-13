@@ -1,0 +1,152 @@
+[
+ {
+  "name": "desktop: landing still scrolls all 7 sections on one page",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "desktop: Reach-out toggle sits in the Contact section",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "desktop: burger menu lists every section + 'Connect / Reach out'",
+  "pass": true,
+  "note": "['About', 'Skills', 'Projects', 'Experience', 'Education', 'Research', 'Contact', 'Connect / Reach out', 'Game mode', 'Guided tour', 'Admin Login']"
+ },
+ {
+  "name": "desktop: burger link opens its own page /skills",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "desktop: page has its own title, no hero, Back button",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "desktop: Back returns to the previous page",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "desktop: toggle opens /connect",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "desktop: no page errors",
+  "pass": true,
+  "note": "[]"
+ },
+ {
+  "name": "phone: landing still scrolls all 7 sections on one page",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "phone: Reach-out toggle sits in the Contact section",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "phone: burger menu lists every section + 'Connect / Reach out'",
+  "pass": true,
+  "note": "['About', 'Skills', 'Projects', 'Experience', 'Education', 'Research', 'Contact', 'Connect / Reach out', 'Game mode', 'Guided tour', 'Admin Login']"
+ },
+ {
+  "name": "phone: burger link opens its own page /skills",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "phone: page has its own title, no hero, Back button",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "phone: Back returns to the previous page",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "phone: toggle opens /connect",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "phone: no page errors",
+  "pass": true,
+  "note": "[]"
+ },
+ {
+  "name": "sedan and car-change button are gone",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "no DRIFT button; brake + gas pedals and the P R N D selector exist",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "brake (KeyS) stops the car and never reverses it",
+  "pass": true,
+  "note": "{'mn': 0, 'v': 0}"
+ },
+ {
+  "name": "brake (Space) stops the car and never reverses it",
+  "pass": true,
+  "note": "{'mn': 0, 'v': 0}"
+ },
+ {
+  "name": "gas: D drives forward, R drives backward, N and P do not move the car",
+  "pass": true,
+  "note": "[23.4, -12, 0, 0]"
+ },
+ {
+  "name": "at 72 km/h R and P are refused (toast), N is allowed",
+  "pass": true,
+  "note": "[False, False, 'D', True, 'N']"
+ },
+ {
+  "name": "stopped: R is accepted",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "gear knob hides above 25 km/h, stays hidden at 22, returns below 20, stays at 24 after returning",
+  "pass": true,
+  "note": "[True, True, False, False]"
+ },
+ {
+  "name": "brake + steering at speed drifts; braking straight or steering alone does not",
+  "pass": true,
+  "note": "[{'g': 1, 's': 0.9995279434430576}, 40, 40]"
+ },
+ {
+  "name": "no page errors in Drive Mode",
+  "pass": true,
+  "note": "[]"
+ },
+ {
+  "name": "'Open full page' opens that section's own page (not the landing page)",
+  "pass": true,
+  "note": "http://127.0.0.1:3100/skills"
+ },
+ {
+  "name": "page shows Back to Drive",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "Back to Drive resumes the game at the exact spot where it was left",
+  "pass": true,
+  "note": "[{'px': -870.3124555594336, 'pz': -201.02111479025433, 'H': 2.984990776607781}, {'run': True, 'px': -870.3124555594336, 'pz': -201.02111479025433, 'H': 2.984990776607781, 'key': None}]"
+ },
+ {
+  "name": "no page errors on the round trip",
+  "pass": true,
+  "note": "[]"
+ }
+]

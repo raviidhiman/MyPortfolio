@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta name="google-site-verification" content="gKDB1_70Y07uSwvsef_PWADxzoKm-gnvc6zoq3l4dFs" />
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#05060f">
+<title>Chat — Ravi Dhiman</title>
+<link rel="icon" type="image/png" href="/assets/icons/android-chrome-192x192.png">
+<style>
+:root{--bg:#05060f;--s:#0d1024;--s2:#141836;--t:#e8ecff;--m:#8d96c4;--cy:#00e5ff;--vi:#8b5cf6;--bd:#242a55;--bad:#ff5d7a;--ok:#34d399;color-scheme:dark}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--t);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,textarea{font:inherit;color:inherit}:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+.wrap{height:100%;height:100dvh;max-width:720px;margin:0 auto;display:flex;flex-direction:column;padding:env(safe-area-inset-top,0px) 14px env(safe-area-inset-bottom,0px)}
+header{display:flex;align-items:center;gap:12px;padding:14px 2px;border-bottom:1px solid var(--bd)}
+header a.back{width:40px;height:40px;display:grid;place-items:center;border:1px solid var(--bd);border-radius:50%;background:var(--s);color:var(--t);flex:none;transition:border-color .2s,color .2s}header a.back:hover{border-color:var(--cy);color:var(--cy)}
+header h1{margin:0;font-size:18px;font-weight:600;letter-spacing:.3px;line-height:1.2}header small{display:block;color:var(--m);font-size:13px;font-weight:400}
+.st{margin-left:auto;padding:3px 12px;border-radius:999px;font-size:12px;border:1px solid var(--bd);color:var(--m);white-space:nowrap}.st.open{border-color:#34d39988;color:var(--ok)}.st.closed{border-color:#ff5d7a88;color:var(--bad)}
+#log{flex:1;overflow-y:auto;padding:16px 2px;display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain}
+.empty{margin:auto;color:var(--m);text-align:center;max-width:320px}
+.bub{max-width:84%;padding:9px 14px;border-radius:16px;background:var(--s2);border:1px solid var(--bd);white-space:pre-wrap;overflow-wrap:anywhere}
+.bub small{display:block;color:var(--m);font-size:11px;margin-top:3px}
+.bub.visitor{align-self:flex-end;background:#00e5ff1a;border-color:#00e5ff55;border-bottom-right-radius:5px}.bub.admin{align-self:flex-start;border-bottom-left-radius:5px}
+.note{margin:6px 0;padding:10px 14px;border-radius:12px;text-align:center;font-size:14px}.note.err{background:#ff5d7a22;border:1px solid #ff5d7a66}.note.closed{background:var(--s);border:1px solid var(--bd);color:var(--m)}
+form{display:flex;gap:10px;align-items:flex-end;padding:12px 0 14px;border-top:1px solid var(--bd)}form[hidden]{display:none}
+textarea{flex:1;min-height:46px;max-height:140px;resize:none;background:var(--s);border:1px solid var(--bd);border-radius:14px;padding:11px 14px}textarea:focus{border-color:var(--cy);outline:0}
+.send{flex:none;height:46px;padding:0 22px;border-radius:999px;border:1px solid var(--cy);background:#00e5ff14;color:var(--cy);font-weight:600;cursor:pointer;transition:background .2s}.send:hover:not(:disabled){background:#00e5ff26}.send:disabled{opacity:.5;cursor:not-allowed}
+</style></head><body>
+<div class="wrap">
+ <header><a class="back" href="/" aria-label="Back to the portfolio" title="Back to the portfolio"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+  <h1>Chat with Ravi Dhiman<small id="who"></small></h1><span class="st" id="st" hidden></span></header>
+ <div id="log" aria-live="polite"><div class="empty" id="empty">Loading…</div></div>
+ <form id="f" hidden><textarea id="m" rows="1" maxlength="1000" placeholder="Write a message" aria-label="Message" enterkeyhint="send"></textarea><button class="send" id="b" type="submit">Send</button></form>
+</div>
+<script>
+const $=s=>document.querySelector(s),token=location.pathname.split('/').filter(Boolean)[1]||'',log=$('#log');let last=0,open=false,busy=false,timer=null,dead=false;
+const t=d=>new Date(d).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+function el(c,txt,tag='div'){const e=document.createElement(tag);e.className=c;if(txt!=null)e.textContent=txt;return e}
+function show(posts){const near=log.scrollHeight-log.scrollTop-log.clientHeight<90||!last;
+ if(posts.length){const e=$('#empty');if(e)e.remove()}
+ posts.forEach(p=>{const b=el('bub '+p.sender,p.body);b.append(el('',(p.sender==='visitor'?'You':'Ravi')+' · '+t(p.created_at),'small'));log.append(b);last=Math.max(last,p.id)});
+ if(near)log.scrollTop=log.scrollHeight}
+function setState(s,name){open=s==='open';const st=$('#st');st.hidden=false;st.className='st '+s;st.textContent=open?'Open':'Closed';$('#f').hidden=!open;
+ if(name)$('#who').textContent='Hi '+name;
+ if(!open&&!$('#closedNote')){const n=el('note closed','This chat has been closed. Thank you for reaching out.');n.id='closedNote';log.append(n);log.scrollTop=log.scrollHeight}
+ const e=$('#empty');if(e&&open)e.textContent='Say hello — Ravi will reply here.'}
+async function pull(){if(dead||busy)return;busy=true;
+ try{const r=await fetch('/api/chat/'+encodeURIComponent(token)+'?after='+last,{cache:'no-store'});
+  if(r.status===404){dead=true;clearInterval(timer);log.replaceChildren(el('empty','This chat link is not valid.'));$('#f').hidden=true;return}
+  if(!r.ok)throw 0;const j=await r.json();show(j.posts);setState(j.status,j.name);if(j.status!=='open')clearInterval(timer)}catch(_){}busy=false}
+function poll(){clearInterval(timer);timer=setInterval(()=>{if(!document.hidden)pull()},3000)}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});
+const ta=$('#m');ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=Math.min(140,ta.scrollHeight)+'px'});
+ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!matchMedia('(pointer:coarse)').matches){e.preventDefault();$('#f').requestSubmit()}});
+$('#f').addEventListener('submit',async e=>{e.preventDefault();const body=ta.value.trim();if(!body||!open)return;$('#b').disabled=true;
+ try{const r=await fetch('/api/chat/'+encodeURIComponent(token)+'/post',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({body})});const j=await r.json().catch(()=>({}));
+  if(!r.ok){const n=el('note err',j.error||'Could not send. Try again.');log.append(n);log.scrollTop=log.scrollHeight;setTimeout(()=>n.remove(),4000);if(r.status===409)pull()}
+  else{ta.value='';ta.style.height='auto';busy=false;await pull()}}catch(_){const n=el('note err','No connection. Try again.');log.append(n);setTimeout(()=>n.remove(),4000)}
+ $('#b').disabled=false;ta.focus()});
+pull().then(poll);
+</script></body></html>

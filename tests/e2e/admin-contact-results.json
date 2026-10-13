@@ -1,0 +1,117 @@
+[
+ {
+  "name": "login: only 'Admin Login' + 'Send code' are visible text",
+  "pass": true,
+  "note": "['Admin Login', 'Send code']"
+ },
+ {
+  "name": "login: no email field",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "login: heading and button are centered on the page",
+  "pass": true,
+  "note": "{'cx': 500, 'cy': 350, 'hx': 499.9921875, 'bx': 499.9921875, 'gy': 336.9921875, 'vh': 700}"
+ },
+ {
+  "name": "login: back-to-site arrow (icon only) links to /",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "login: favicon is the 192 icon",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "login: code box appears after Send code; Send button gone",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "login: Resend is disabled with a countdown",
+  "pass": true,
+  "note": "Resend in 30s"
+ },
+ {
+  "name": "login: code was 'e-mailed' (dev log) to ADMIN_EMAIL",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "login: Resend unlocks after 30 s",
+  "pass": true,
+  "note": "Resend code"
+ },
+ {
+  "name": "login: Resend sends a new code and restarts the countdown",
+  "pass": true,
+  "note": "053915->248462"
+ },
+ {
+  "name": "login: wrong code rejected",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "login: valid code opens the admin panel (Messages tab present)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "connect: WhatsApp button points at +91 93065 39506",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "connect: form submits and shows the thank-you card",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "connect: owner is e-mailed the form (dev log shows it)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "invite: visitor receives a private chat link by e-mail",
+  "pass": true,
+  "note": "http://127.0.0.1:3100/chat/g-1TfYAZbQZefXgBQHyy2KO42OYZpBf5"
+ },
+ {
+  "name": "chat: visitor page opens, greets by name, status Open",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "chat: admin sees the visitor message live (polling)",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "chat: visitor sees the admin reply live",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "chat: admin closes it; composer is gone for the admin",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "chat: visitor sees 'closed' and can no longer type",
+  "pass": true,
+  "note": ""
+ },
+ {
+  "name": "chat: server refuses posts on a closed chat (409)",
+  "pass": true,
+  "note": "409"
+ },
+ {
+  "name": "no page errors in admin",
+  "pass": true,
+  "note": "[]"
+ }
+]
